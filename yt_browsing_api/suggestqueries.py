@@ -5,6 +5,7 @@ Parsing suggest queries from YouTube
 from typing import Optional, List
 import requests
 import json
+from urllib import parse
 
 from .enums import Languages, Regions
 
@@ -38,9 +39,10 @@ def parse_text_queries(text_json:str) -> Optional[List[str]]:
     return queries
 
 
-def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US) -> Optional[List[str]]:
+def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, timeout=5.0) -> Optional[List[str]]:
     """
     Get suggest queries from YouTube
+    Arguments:
     - query       [required]
     - language    [optional], default = "en"
     - region      [optional], default = "us
@@ -53,10 +55,10 @@ def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US) ->
     # hl - language
     # cp - number of suggestions
     # q - query
-    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={query}"
+    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={parse.quote(query, safe="")}"
 
     try:
-        response = requests.get(query, timeout=12.0)
+        response = requests.get(query, timeout=timeout)
     except:
         return None
     
