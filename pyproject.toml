@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "youtube-browsing-api"
+dynamic = ["version"]
+description = "Browsing only (no video download) simple youtube API"
+readme = "README.md"
+
+license = { name = "MIT", file = "LICENSE" }
+
+authors = [ { name = "Plushka" } ]
+
+dependencies = [
+    "requests>=2.34"
+]
+
+[project.urls]
+Source = "https://github.com/PlushkaNet/youtube-browsing-api"
+
+[tool.hatch.version]
+path = "yt_browsing_api/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["yt_browsing_api"]

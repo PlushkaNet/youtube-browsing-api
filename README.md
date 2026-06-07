@@ -1,5 +1,11 @@
 <center><h2>Youtube browsing API</h2></center>
 
+## Quick start
+Install package via pip using:
+```
+pip install git+https://github.com/PlushkaNet/youtube_browsing_api.git
+```
+
 <b>Suggestion queries usage example:</b>
 ```
 from yt_browsing_api import get_suggest_queries
