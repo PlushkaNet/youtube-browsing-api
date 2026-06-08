@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 # TODO add more languages
-class Languages(Enum):
+class Languages(StrEnum):
     EN    = "en"    # English
     AR    = "ar"    # Arabic
     ES_US = "es-us" # Spanish
@@ -18,7 +18,7 @@ class Languages(Enum):
     TR    = "tr"    # Turkish
 
 # TODO add more regions
-class Regions(Enum):
+class Regions(StrEnum):
     US = "us" # United States
     GB = "gb" # United Kingdom
     AR = "ar" # Argentina

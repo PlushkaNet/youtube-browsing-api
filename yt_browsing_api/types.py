@@ -5,8 +5,8 @@ class Video:
     id                :str
     title             :str
     author            :str
-    duration          :int
-    views             :int
+    duration          :str
+    views             :str
     publish_time      :str
     video_thumbnail   :str
     channel_thumbnail :str
@@ -18,6 +18,6 @@ class Video:
 class Channel:
     id           :str
     title        :str
-    subs_count   :int
+    subs_count   :str
     thumbnail    :str
     account_type :str

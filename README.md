@@ -16,9 +16,24 @@ for i in range(len(queries)):
     print(f"Suggestion query #{i+1}: {queries[i]}")
 ```
 
+<b>Search usage example:</b>
+```
+from yt_browsing_api import search
+
+results: list = search("NCS", page=1)
+
+print(results)
+```
+
+<h3>Complete examples can be found in <a href="examples/">examples/</a> directory</h3>
+<ul>
+<li><b><a href="examples/suggestion_queries.py">Suggestion queries complete example</a></b></li>
+<li><b><a href="examples/search.py">Videos/Channels search complete example</a></b></li>
+</ul>
+
 <b>Currently supports:</b>
 - Suggestion queries
+- Search
 
 <b>In development:</b>
-- Search
 - Exploring channels

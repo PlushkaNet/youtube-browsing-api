@@ -1,7 +1,7 @@
 import json
 import requests
 from urllib import parse
-from typing import Union
+from typing import Union, Optional
 
 from .enums import Languages, Regions
 from .types import Video, Channel
@@ -9,12 +9,12 @@ from .types import Video, Channel
 
 def _make_url(query: str, page: int, region: str):
     """ Internal method for prepare url to fetch from """
-    return "https://youtube.com/results?q=" + parse.quote(query, safe="") + f"&page={page}&gl={region}"
+    return "https://www.youtube.com/results?q=" + parse.quote(query, safe="") + f"&page={page}&gl={region}"
 
 
-def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0):
+def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0) -> Optional[list[Union[Video, Channel]]]:
     """
-    Initializes SearchResults object performing a search
+    Performes a search
     Arguments:
     - query    [required]
     - language [optional], default = "en"
@@ -22,7 +22,7 @@ def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout
     - page     [optional], default = 1
     - timeout  [optional], default = 5.0
 
-    Returns completed SearchResults on success
+    Returns completed list of Video | Channel on success
     Returns None on fail
     """
 
@@ -35,10 +35,14 @@ def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout
 
     results: list[Union[Video, Channel]] = []
 
-    response = requests.get(
-        _make_url(query, page, region),
-        headers=headers,
-        timeout=timeout)
+    try:
+        response = requests.get(
+            _make_url(query, page, region),
+            headers=headers,
+            timeout=timeout
+        )
+    except:
+        return None
 
     if response.status_code != 200: return None
 
@@ -52,12 +56,45 @@ def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout
     try:
         data = json.loads(data)
         section_lists = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
+
+        for section_list in section_lists:
+            if "itemSectionRenderer" not in section_list: continue
+            for content in section_list["itemSectionRenderer"]["contents"]:
+                try:
+                    try:
+                        # trying to get it here to skip doubling later
+                        account_type = content["videoRenderer"]["ownerBadges"][0]["metadataBadgeRenderer"]["style"]
+                    except:
+                        account_type = "regular"
+                    if "videoRenderer" in content.keys():
+                        results.append(
+                            Video(
+                                content["videoRenderer"]["videoId"],
+                                content["videoRenderer"]["title"]["runs"][0]["text"],
+                                content["videoRenderer"]["ownerText"]["runs"][0]["text"],
+                                content["videoRenderer"]["lengthText"]["simpleText"],
+                                content["videoRenderer"]["viewCountText"]["simpleText"],
+                                content["videoRenderer"]["publishedTimeText"]["simpleText"],
+                                content["videoRenderer"]["thumbnail"]["thumbnails"][-1]["url"], # best quality
+                                content["videoRenderer"]["channelThumbnailSupportedRenderers"]["channelThumbnailWithLinkRenderer"]["thumbnail"]["thumbnails"][0]["url"],
+                                content["videoRenderer"]["detailedMetadataSnippets"][0]["snippetText"]["runs"][0]["text"],
+                                account_type
+                            )
+                        )
+                    
+                    elif "channelRenderer" in content.keys():
+                        results.append(
+                            Channel(
+                                content["channelRenderer"]["channelId"],
+                                content["channelRenderer"]["title"]["simpleText"],
+                                content["channelRenderer"]["videoCountText"]["accessibility"]["accessibilityData"]["label"],
+                                content["channelRenderer"]["thumbnail"]["thumbnails"][0]["url"], # starts with //
+                                account_type
+                            )
+                        )
+                except:
+                    continue
     except:
         return None
 
-    if type(section_lists) != list:
-        return None
-
-    for section_list in section_lists:
-        if type(section_list) != dict or "itemSectionRenderer" not in section_list: continue
-        
+    return results
