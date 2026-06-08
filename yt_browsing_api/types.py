@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
 
@@ -125,6 +125,7 @@ class Channel:
         return asdict(self)
 
 
+@dataclass
 class SearchResults:
     """
     Class representing search results
@@ -133,10 +134,31 @@ class SearchResults:
     - found   # how many results was found  (int)
     - page    # search page                 (int)
     """
-    def __init__(self, results: list[Union[Video, Channel]], found: int, page: int):
-        self.results = results
-        self.found   = found
-        self.page    = page
-    
+
+    results :list[Union[Video, Channel]]
+    found   :int
+    page    :int
+
     def __iter__(self):
         yield from self.results
+
+    def as_dict(self):
+        """ Returns SearchResults as a JSON-like object """
+        return asdict(self)
+
+
+@dataclass
+class ChannelInfo:
+    """
+    Class representing full info about YouTube channel
+    In difference from Channel, ChannelInfo contains advanced info about channel, unavaliable from search
+    """
+    
+    title      :str
+    subs_count :str
+    thumbnail  :str
+    banner_img :Optional[str]
+
+    def as_dict(self):
+        """ Returns ChannelInfo as a JSON-like object """
+        return asdict(self)

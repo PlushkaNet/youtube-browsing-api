@@ -30,6 +30,7 @@ print(results.results) # list of videos and channels
 <ul>
 <li><b><a href="examples/suggestion_queries.py">Suggestion queries complete example</a></b></li>
 <li><b><a href="examples/search.py">Videos/Channels search complete example</a></b></li>
+<li><b><a href="examples/channel.py">Fetching channel info complete example</a></b></li>
 </ul>
 
 <b>Currently supports:</b>
