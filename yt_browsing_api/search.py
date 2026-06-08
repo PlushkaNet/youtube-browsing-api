@@ -4,7 +4,7 @@ from urllib import parse
 from typing import Union, Optional
 
 from .enums import Languages, Regions
-from .types import Video, Channel
+from .types import Video, Channel, SearchResults
 
 
 def _make_url(query: str, page: int, region: str):
@@ -12,7 +12,7 @@ def _make_url(query: str, page: int, region: str):
     return "https://www.youtube.com/results?q=" + parse.quote(query, safe="") + f"&page={page}&gl={region}"
 
 
-def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0) -> Optional[list[Union[Video, Channel]]]:
+def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0) -> Optional[SearchResults]:
     """
     Performes a search
     Arguments:
@@ -22,7 +22,7 @@ def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout
     - page     [optional], default = 1
     - timeout  [optional], default = 5.0
 
-    Returns completed list of Video | Channel on success
+    Returns completed SearchResults on success
     Returns None on fail
     """
 
@@ -94,7 +94,9 @@ def search(query: str, language=Languages.EN, region=Regions.US, page=1, timeout
                         )
                 except:
                     continue
+
+        search_results = SearchResults(results, data["estimatedResults"], page)
     except:
         return None
 
-    return results
+    return search_results

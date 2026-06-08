@@ -1,3 +1,4 @@
+from typing import Union
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
 
@@ -122,3 +123,20 @@ class Channel:
     def as_dict(self):
         """ Returns Channel as a JSON-like object """
         return asdict(self)
+
+
+class SearchResults:
+    """
+    Class representing search results
+    Fields:
+    - results # list with searching results (list[Video | Channel])
+    - found   # how many results was found  (int)
+    - page    # search page                 (int)
+    """
+    def __init__(self, results: list[Union[Video, Channel]], found: int, page: int):
+        self.results = results
+        self.found   = found
+        self.page    = page
+    
+    def __iter__(self):
+        yield from self.results
