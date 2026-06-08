@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 @dataclass
 class Video:
@@ -13,6 +13,10 @@ class Video:
     short_desc        :str
     account_type      :str
 
+    def as_dict(self):
+        """ Returns Video as a JSON-like object """
+        return asdict(self)
+
 
 @dataclass
 class Channel:
@@ -21,3 +25,7 @@ class Channel:
     subs_count   :str
     thumbnail    :str
     account_type :str
+
+    def as_dict(self):
+        """ Returns Channel as a JSON-like object """
+        return asdict(self)
