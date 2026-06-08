@@ -2,6 +2,7 @@ from enum import StrEnum
 
 # TODO add more languages
 class Languages(StrEnum):
+    """ Enum with YouTube-supported localisations """
     EN    = "en"    # English
     AR    = "ar"    # Arabic
     ES_US = "es-us" # Spanish
@@ -19,6 +20,7 @@ class Languages(StrEnum):
 
 # TODO add more regions
 class Regions(StrEnum):
+    """ Enum with YouTube-supported regions"""
     US = "us" # United States
     GB = "gb" # United Kingdom
     AR = "ar" # Argentina
@@ -41,3 +43,10 @@ class Regions(StrEnum):
     UA = "ua" # Ukraine
     AE = "ae" # United Arab Imirates
     ES = "es" # Spain
+
+
+class AccountTypes(StrEnum):
+    """ Enum with account types for channels """
+    REGULAR  = "regular"  # just regular account type
+    ARTIST   = "artist"   # verified music artist
+    VERIFIED = "verified" # verified account type

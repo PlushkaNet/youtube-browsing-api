@@ -20,9 +20,10 @@ for i in range(len(queries)):
 ```
 from yt_browsing_api import search
 
-results: list = search("NCS", page=1)
+results = search("NCS", page=1)
 
-print(results)
+print(results.found)   # prints how much entries are there
+print(results.results) # list of videos and channels
 ```
 
 <h3>Complete examples can be found in <a href="examples/">examples/</a> directory</h3>

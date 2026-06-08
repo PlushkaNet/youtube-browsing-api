@@ -2,9 +2,9 @@
 Search API usage example
 """
 
-from yt_browsing_api import search, Video, Channel, Languages, Regions
+from yt_browsing_api import search, Video, Channel, Languages, Regions, SearchResults
 
-results: list[Channel | Video] | None = search("NCS")
+results: SearchResults | None = search("NCS")
 
 for i in results:
     if type(i) == Channel:
@@ -31,4 +31,4 @@ for i in results:
         print(f"\tChannel thumb: {i.channel_thumbnail}") # Video's author's (channel's) thumbnail URL
 
 # you also can search videos in specific region with specific language chosen
-results: list[Channel | Video] | None = search("NCS", language=Languages.FR, region=Regions.FR, page=2)
+results: SearchResults | None = search("NCS", language=Languages.FR, region=Regions.FR, page=2)
