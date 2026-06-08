@@ -1,3 +1,7 @@
+"""
+Suggestion queries API usage example
+"""
+
 from yt_browsing_api import get_suggest_queries
 
 queries: list[str] | None = get_suggest_queries("NCS")

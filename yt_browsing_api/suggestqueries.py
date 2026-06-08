@@ -2,52 +2,12 @@
 Parsing suggest queries from YouTube
 """
 
-from enum import Enum
 from typing import Optional, List
 import requests
 import json
+from urllib import parse
 
-# TODO add more languages
-class Languages(Enum):
-    EN    = "en"    # English
-    AR    = "ar"    # Arabic
-    ES_US = "es-us" # Spanish
-    FR    = "fr"    # French
-    DE    = "de"    # German
-    AF    = "af"    # African
-    PT    = "pt-pt" # Portuguese
-    MN    = "mn"    # Mongolian
-    RU    = "ru"    # Russian
-    UK    = "uk"    # Ukrainian
-    BE    = "be"    # Belarusian
-    SR    = "sr"    # Serbian
-    NL    = "nl"    # Dutch
-    TR    = "tr"    # Turkish
-
-# TODO add more regions
-class Regions(Enum):
-    US = "us" # United States
-    GB = "gb" # United Kingdom
-    AR = "ar" # Argentina
-    AM = "am" # Armenia
-    AU = "au" # Australia
-    AT = "at" # Austria
-    AZ = "az" # Azerbaijan
-    BY = "by" # Belarus
-    BR = "br" # Brazil
-    CA = "ca" # Canada
-    CL = "cl" # Chile
-    FR = "fr" # France
-    DE = "de" # Germany
-    EG = "eg" # Egypt
-    IN = "in" # India
-    JP = "jp" # Japan
-    IT = "it" # Italy
-    RU = "ru" # Russia
-    KZ = "kz" # Kazakhstan
-    UA = "ua" # Ukraine
-    AE = "ae" # United Arab Imirates
-    ES = "es" # Spain
+from .enums import Languages, Regions
 
 # clears google's response
 def clear_google_response(resp:str) -> str:
@@ -79,9 +39,10 @@ def parse_text_queries(text_json:str) -> Optional[List[str]]:
     return queries
 
 
-def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US) -> Optional[List[str]]:
+def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, timeout=5.0) -> Optional[List[str]]:
     """
     Get suggest queries from YouTube
+    Arguments:
     - query       [required]
     - language    [optional], default = "en"
     - region      [optional], default = "us
@@ -94,10 +55,10 @@ def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US) ->
     # hl - language
     # cp - number of suggestions
     # q - query
-    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={query}"
+    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={parse.quote(query, safe="")}"
 
     try:
-        response = requests.get(query, timeout=12.0)
+        response = requests.get(query, timeout=timeout)
     except:
         return None
     
