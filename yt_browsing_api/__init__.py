@@ -4,4 +4,4 @@ from .types import Video, Channel
 from .enums import Languages, Regions
 from .beautifier import beautify, beautify_Video, beautify_Channel
 
-__version__ = "0.21"
+__version__ = "0.22"

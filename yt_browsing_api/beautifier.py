@@ -2,6 +2,8 @@ from typing import Union, Optional
 from .types import Video, Channel
 from .enums import AccountTypes
 
+# marked as deprecated; will be removed in future versions
+
 
 def _translate_account_type(account_type: str) -> str:
     """ Translates account type to internal StrEnum type """
