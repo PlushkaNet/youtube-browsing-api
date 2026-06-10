@@ -4,4 +4,4 @@ from .channel import GetChannelInfo
 from .types import Video, Channel, SearchResults, ChannelDescription
 from .enums import Languages, Regions
 
-__version__ = "0.25"
+__version__ = "0.2.6"

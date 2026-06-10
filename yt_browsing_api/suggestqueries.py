@@ -1,5 +1,5 @@
 """
-Parsing suggest queries from YouTube
+File containing code for parsing suggest queries from YouTube
 """
 
 from typing import Optional, List

@@ -1,3 +1,5 @@
+""" File containing code for YouTube channels operations """
+
 from typing import Optional
 import json
 import requests
@@ -115,6 +117,10 @@ class GetChannelInfo:
         Raises an exception on failure
         """
 
+        # reassign Accept-Language field in local headers to be up-to-date with new [language] arg
+        headers = self._headers
+        headers["Accept-Language"] = language
+
         try:
             rollout_token   : str = self._cookies["__Secure-ROLLOUT_TOKEN"]
             visitor_metadata: str = self._cookies["VISITOR_PRIVACY_METADATA"]
@@ -148,12 +154,12 @@ class GetChannelInfo:
         response = requests.post(
             "https://www.youtube.com/youtubei/v1/browse?prettyPrint=false",
             cookies=self._cookies,
-            headers=self._headers,
+            headers=headers,
             json=post_data
         )
 
         if response.status_code != 200:
-            raise Exception(f"Response status is {response.status_code}\n{response.text}\n\n{self._desc_continuation_token}\n\n{self._url}\n\n{rollout_token}\n\n{visitor_metadata}\n\n{response.request.body}")
+            raise Exception(f"Response status is {response.status_code}")
 
         data = json.loads(response.text)
 

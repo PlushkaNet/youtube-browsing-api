@@ -1,3 +1,5 @@
+""" File containing code for YouTube search operations """
+
 import json
 import requests
 from urllib import parse
