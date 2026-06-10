@@ -14,7 +14,7 @@ if chan:
     print(f"Title              : {chan.title}")
     print(f"Subscribers count  : {chan.subs_count}")
     print(f"Thumbnail url      : {chan.thumbnail}")
-    print(f"Banner url         : {chan.banner_img | 'no banner'}")
+    print(f"Banner url         : {chan.banner_img or 'no banner'}")
 
 # get channel description (send addition POST request)
 

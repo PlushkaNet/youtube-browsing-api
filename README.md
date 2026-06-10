@@ -18,7 +18,7 @@ for i in range(len(queries)):
 
 <b>Search usage example:</b>
 ```
-from yt_browsing_api import search
+from yt_browsing_api import Search
 
 results = search("NCS", page=1)
 
@@ -36,6 +36,13 @@ print(results.results) # list of videos and channels
 <b>Currently supports:</b>
 - Suggestion queries
 - Search
+- Exploring channels (partly)
 
-<b>In development:</b>
-- Exploring channels
+<b>In development (channels):</b>
+- Recent videos
+- All videos
+- Playelists
+- External platforms links in description support
+
+<b>In development (search) </b>
+- .next() method (to fetch results from next page automatically)

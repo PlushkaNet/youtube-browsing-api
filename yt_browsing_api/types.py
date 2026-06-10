@@ -1,6 +1,21 @@
-from typing import Union, Optional
+""" File containing code for common exceptions and YouTube entries objects """
+
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
+
+class ExtractorError(Exception):
+    pass
+
+
+class ParserError(Exception):
+    pass
+
+
+class InvalidStatusError(Exception):
+    def __init__(self, status_code: int):
+        self.status_code = status_code
+        super().__init__(f"Status code is {status_code}")
+
 
 def _translate_account_type(account_type: str) -> str:
     """ Translates account type to internal StrEnum type """
@@ -125,28 +140,6 @@ class Channel:
 
     def as_dict(self):
         """ Returns Channel as a JSON-like object """
-        return asdict(self)
-
-
-@dataclass
-class SearchResults:
-    """
-    Class representing search results
-    Fields:
-    - results # list with searching results (list[Video | Channel])
-    - found   # how many results was found  (int)
-    - page    # search page                 (int)
-    """
-
-    results :list[Union[Video, Channel]]
-    found   :int
-    page    :int
-
-    def __iter__(self):
-        yield from self.results
-
-    def as_dict(self):
-        """ Returns SearchResults as a JSON-like object """
         return asdict(self)
 
 
