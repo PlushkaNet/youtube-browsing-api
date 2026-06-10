@@ -1,52 +1,51 @@
-from enum import StrEnum
+from typing import Final
 
 # TODO add more languages
-class Languages(StrEnum):
+class Languages:
     """ Enum with YouTube-supported localisations """
-    EN    = "en"    # English
-    AR    = "ar"    # Arabic
-    ES_US = "es-us" # Spanish
-    FR    = "fr"    # French
-    DE    = "de"    # German
-    AF    = "af"    # African
-    PT    = "pt-pt" # Portuguese
-    MN    = "mn"    # Mongolian
-    RU    = "ru"    # Russian
-    UK    = "uk"    # Ukrainian
-    BE    = "be"    # Belarusian
-    SR    = "sr"    # Serbian
-    NL    = "nl"    # Dutch
-    TR    = "tr"    # Turkish
+    EN    :Final[str] = "en"    # English
+    AR    :Final[str] = "ar"    # Arabic
+    ES_US :Final[str] = "es-us" # Spanish
+    FR    :Final[str] = "fr"    # French
+    DE    :Final[str] = "de"    # German
+    AF    :Final[str] = "af"    # African
+    PT    :Final[str] = "pt-pt" # Portuguese
+    MN    :Final[str] = "mn"    # Mongolian
+    RU    :Final[str] = "ru"    # Russian
+    UK    :Final[str] = "uk"    # Ukrainian
+    BE    :Final[str] = "be"    # Belarusian
+    SR    :Final[str] = "sr"    # Serbian
+    NL    :Final[str] = "nl"    # Dutch
+    TR    :Final[str] = "tr"    # Turkish
 
 # TODO add more regions
-class Regions(StrEnum):
-    """ Enum with YouTube-supported regions"""
-    US = "us" # United States
-    GB = "gb" # United Kingdom
-    AR = "ar" # Argentina
-    AM = "am" # Armenia
-    AU = "au" # Australia
-    AT = "at" # Austria
-    AZ = "az" # Azerbaijan
-    BY = "by" # Belarus
-    BR = "br" # Brazil
-    CA = "ca" # Canada
-    CL = "cl" # Chile
-    FR = "fr" # France
-    DE = "de" # Germany
-    EG = "eg" # Egypt
-    IN = "in" # India
-    JP = "jp" # Japan
-    IT = "it" # Italy
-    RU = "ru" # Russia
-    KZ = "kz" # Kazakhstan
-    UA = "ua" # Ukraine
-    AE = "ae" # United Arab Imirates
-    ES = "es" # Spain
+class Regions:
+    """ Class serving YouTube-supported regions """
+    US :Final[str] = "us" # United States
+    GB :Final[str] = "gb" # United Kingdom
+    AR :Final[str] = "ar" # Argentina
+    AM :Final[str] = "am" # Armenia
+    AU :Final[str] = "au" # Australia
+    AT :Final[str] = "at" # Austria
+    AZ :Final[str] = "az" # Azerbaijan
+    BY :Final[str] = "by" # Belarus
+    BR :Final[str] = "br" # Brazil
+    CA :Final[str] = "ca" # Canada
+    CL :Final[str] = "cl" # Chile
+    FR :Final[str] = "fr" # France
+    DE :Final[str] = "de" # Germany
+    EG :Final[str] = "eg" # Egypt
+    IN :Final[str] = "in" # India
+    JP :Final[str] = "jp" # Japan
+    IT :Final[str] = "it" # Italy
+    RU :Final[str] = "ru" # Russia
+    KZ :Final[str] = "kz" # Kazakhstan
+    UA :Final[str] = "ua" # Ukraine
+    AE :Final[str] = "ae" # United Arab Imirates
+    ES :Final[str] = "es" # Spain
 
-
-class AccountTypes(StrEnum):
+class AccountTypes:
     """ Enum with account types for channels """
-    REGULAR  = "regular"  # just regular account type
-    ARTIST   = "artist"   # verified music artist
-    VERIFIED = "verified" # verified account type
+    REGULAR  :Final[str] = "regular"  # just regular account type
+    ARTIST   :Final[str] = "artist"   # verified music artist
+    VERIFIED :Final[str] = "verified" # verified account type

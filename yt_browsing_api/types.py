@@ -1,6 +1,21 @@
-from typing import Union
+""" File containing code for common exceptions and YouTube entries objects """
+
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
+
+class ExtractorError(Exception):
+    pass
+
+
+class ParserError(Exception):
+    pass
+
+
+class InvalidStatusError(Exception):
+    def __init__(self, status_code: int):
+        self.status_code = status_code
+        super().__init__(f"Status code is {status_code}")
+
 
 def _translate_account_type(account_type: str) -> str:
     """ Translates account type to internal StrEnum type """
@@ -29,6 +44,9 @@ class Video:
     - short_desc          # YouTube video's short description                  (str)
     - account_type        # YouTube video's author's (channel's) account type  (str)
     """
+
+    __slots__ = ["id", "title", "author", "duration", "views", "publish_time", "video_thumbnail", "channel_thumbnail", "short_desc", "account_type"]
+    
     def __init__(
          self, id: str, title: str, author: str, duration: str,
          views: str, publish_time: str, video_thumbnail: str,
@@ -125,18 +143,16 @@ class Channel:
         return asdict(self)
 
 
-class SearchResults:
+@dataclass
+class ChannelDescription:
     """
-    Class representing search results
-    Fields:
-    - results # list with searching results (list[Video | Channel])
-    - found   # how many results was found  (int)
-    - page    # search page                 (int)
+    Class representing channel's description
     """
-    def __init__(self, results: list[Union[Video, Channel]], found: int, page: int):
-        self.results = results
-        self.found   = found
-        self.page    = page
-    
-    def __iter__(self):
-        yield from self.results
+    text      :str
+    join_date :str
+    region    :str
+    # urls to be added here
+
+    def as_dict(self):
+        """ Returns ChannelDescription as a JSON-like object """
+        return asdict(self)
