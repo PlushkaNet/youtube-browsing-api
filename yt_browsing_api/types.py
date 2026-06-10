@@ -29,6 +29,9 @@ class Video:
     - short_desc          # YouTube video's short description                  (str)
     - account_type        # YouTube video's author's (channel's) account type  (str)
     """
+
+    __slots__ = ["id", "title", "author", "duration", "views", "publish_time", "video_thumbnail", "channel_thumbnail", "short_desc", "account_type"]
+    
     def __init__(
          self, id: str, title: str, author: str, duration: str,
          views: str, publish_time: str, video_thumbnail: str,
@@ -148,17 +151,15 @@ class SearchResults:
 
 
 @dataclass
-class ChannelInfo:
+class ChannelDescription:
     """
-    Class representing full info about YouTube channel
-    In difference from Channel, ChannelInfo contains advanced info about channel, unavaliable from search
+    Class representing channel's description
     """
-    
-    title      :str
-    subs_count :str
-    thumbnail  :str
-    banner_img :Optional[str]
+    text      :str
+    join_date :str
+    region    :str
+    # urls to be added here
 
     def as_dict(self):
-        """ Returns ChannelInfo as a JSON-like object """
+        """ Returns ChannelDescription as a JSON-like object """
         return asdict(self)

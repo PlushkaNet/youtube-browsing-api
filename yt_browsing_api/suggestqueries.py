@@ -10,7 +10,7 @@ from urllib import parse
 from .enums import Languages, Regions
 
 # clears google's response
-def clear_google_response(resp:str) -> str:
+def _clear_google_response(resp:str) -> str:
     return resp.removeprefix('window.google.ac.h(').removesuffix(')')
 
 
@@ -63,5 +63,5 @@ def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, ti
         return None
     
     if response.ok:
-        return parse_text_queries(clear_google_response(response.text))
+        return parse_text_queries(_clear_google_response(response.text))
     return None
