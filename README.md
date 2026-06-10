@@ -1,9 +1,14 @@
 <center><h2>Youtube browsing API</h2></center>
 
 ## Quick start
-Install package via pip using:
+Install stable package version via pip using:
 ```
 pip install git+https://github.com/PlushkaNet/youtube_browsing_api.git
+```
+
+Or try nightly using:
+```
+pip install git+https://github.com/PlushkaNet/youtube_browsing_api@dev
 ```
 
 <b>Suggestion queries usage example:</b>
@@ -41,7 +46,7 @@ print(results.results) # list of videos and channels
 <b>In development (channels):</b>
 - Recent videos
 - All videos
-- Playelists
+- Playlists
 - External platforms links in description support
 
 <b>In development (search) </b>

@@ -3,6 +3,11 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
+keywords = [
+    "youtube",
+    "api",
+    "youtube-api"
+]
 name = "youtube-browsing-api"
 dynamic = ["version"]
 description = "Browsing only (no video download) simple youtube API"
