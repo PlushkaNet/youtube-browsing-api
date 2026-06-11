@@ -35,6 +35,12 @@ class Search:
 
         return results
 
+    def next(self):
+        self.page += 1 # increases page index by 1
+        # prepares url
+        self._url = self._make_url(self._query, self.page, self._region)
+        self._search() # performes a search
+
     def __init__(self, query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0):
         """
         Initializes class object by performing a search request to YouTube
@@ -55,19 +61,35 @@ class Search:
         and requests.get() exceptions
         """
 
-        # googlebot user agent
+        self.page: int = page
+        self._timeout: float = timeout # saves timeout for future use in ._search()
+
+        # saves query and region for future use in .next()
+        self._region: str = region
+        self._query: str = query
+        
+        # prepares headers for search
         # TODO add headers switch
         self._headers = {
             "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
             "Accept-Language": language
         }
+        
+        # prepares url and saves it for future use
+        self._url = self._make_url(query, page, region)
 
-        self._url = self._make_url(query, page, region) # makes url and saves it for future use
+        self._search() # performes a search
 
+    def _search(self):
+        """
+        Internal search method, use .next() method if you want to get next search results,
+        or initialize new Search object to perform a new search
+        It uses internal _headers as fetch headers, _url as url to fetch from, _timeout as request timeout
+        """
         response = requests.get(
             self._url,
             headers=self._headers,
-            timeout=timeout
+            timeout=self._timeout
         )
 
         if response.status_code != 200:
@@ -86,9 +108,8 @@ class Search:
         try:
             data = json.loads(data) # redefining data here
 
-            self.results: list[Union[Video, Channel]] = [] # results list
+            self.results: list[Union[Video, Channel]] = [] # results list, clears if it was already filled with items
             self.found: int = data["estimatedResults"] # estimated results count
-            self.page: int = page # page of search
             
             section_lists = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
 
