@@ -5,7 +5,7 @@ Search API usage example
 from yt_browsing_api import Search, Video, Channel, Languages, Regions
 
 try:
-    results = Search("NCS", page=1)
+    results = Search("NCS")
 except Exception as e:
     results = None
     print("An error occured while trying to search :(")
@@ -39,20 +39,12 @@ if results:
     # prints all results
     for i in results:
         pretty_print_result(i)
-    
-    results.next() # fetches next page
-
-    print("-"*40 + f"new results from page #{results.page}" + "-"*40)
-
-    # prints all new results again
-    for i in results:
-        pretty_print_result(i)
 
 
 # you also can search videos in specific region with specific language chosen
 try:
     # searching with French language in French region
-    results = Search("NCS", language=Languages.FR, region=Regions.FR, page=2)
+    results = Search("NCS", language=Languages.FR, region=Regions.FR)
 except Exception as e:
     results = None
     print("An error occured while trying to search :(")

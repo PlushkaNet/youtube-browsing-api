@@ -1,12 +1,10 @@
-""" File containing code for YouTube search operations """
+""" File containing code for YouTube search operations using InnerTube API """
 
-import json
-import requests
-from urllib import parse
 from typing import Union
-
+from .types import Video, Channel
 from .enums import Languages, Regions
-from .types import Video, Channel, InvalidStatusError, ExtractorError, ParserError
+from .innertube import Innertube
+from .parsers import youtube_search_parse
 
 class Search:
     """
@@ -14,12 +12,8 @@ class Search:
     Fields:
     - results # list with searching results (list[Video | Channel])
     - found   # how many results was found  (int)
-    - page    # search page                 (int)
     """
-    def _make_url(self, query: str, page: int, region: str):
-        """ Internal method for prepare url to fetch from """
-        return "https://www.youtube.com/results?q=" + parse.quote(query, safe="") + f"&page={page}&gl={region}"
-    
+
     def __iter__(self):
         """ YouTube results iterator """
         yield from self.results
@@ -35,120 +29,45 @@ class Search:
 
         return results
 
-    def next(self):
-        self.page += 1 # increases page index by 1
-        # prepares url
-        self._url = self._make_url(self._query, self.page, self._region)
-        self._search() # performes a search
-
-    def __init__(self, query: str, language=Languages.EN, region=Regions.US, page=1, timeout=5.0):
+    def __init__(self, query: str, language=Languages.EN, region=Regions.US, timeout=5.0):
         """
         Initializes class object by performing a search request to YouTube
         Arguments:
         - query    [required]
         - language [optional], default = "en"
-        - region   [optional], default = "us"
-        - page     [optional], default = 1
+        - region   [optional], default = "US"
         - timeout  [optional], default = 5.0
 
         Returns completed Search object on success
         Raises exception on failure
         
         Can raise different exception types, such as:
-        - ExtractorError
         - ParserError
         - InvalidStatusError
         and requests.get() exceptions
         """
 
-        self.page: int = page
-        self._timeout: float = timeout # saves timeout for future use in ._search()
+        self._innertube = Innertube(language, region, timeout=timeout)
+        self._query = query # saves query for future use
 
-        # saves query and region for future use in .next()
-        self._region: str = region
-        self._query: str = query
-        
-        # prepares headers for search
-        # TODO add headers switch
-        self._headers = {
-            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-            "Accept-Language": language
-        }
-        
-        # prepares url and saves it for future use
-        self._url = self._make_url(query, page, region)
-
-        self._search() # performes a search
+        self._search()
 
     def _search(self):
         """
         Internal search method, use .next() method if you want to get next search results,
         or initialize new Search object to perform a new search
-        It uses internal _headers as fetch headers, _url as url to fetch from, _timeout as request timeout
+
+        Can raise different exception types, such as:
+        - ParserError
+        - InvalidStatusError
+        and requests.get() exceptions
         """
-        response = requests.get(
-            self._url,
-            headers=self._headers,
-            timeout=self._timeout
-        )
 
-        if response.status_code != 200:
-            raise InvalidStatusError(response.status_code)
+        request = self._innertube.make_request("search")
+        request["query"] = self._query # sets search query
+        data = request.perform() # performes a request to YouTube InnerTube API
+        self._innertube.cookies = request.cookies # updates cookies
 
-        try:
-            try: # Old YouTube parsing first
-                data = response.text[response.text.index("ytInitialData")+16::]
-                data = data[:data.index('</script>')-1]
-            except ValueError: # Scraper-compatible YouTube parsing
-                data = response.text[response.text.index("// scraper_data_begin")+42::]
-                data = data[:data.index('// scraper_data_end')-3]
-        except:
-            raise ExtractorError("Extracting error while trying to find ytInitialData or // scrapper_data_begin\nProbably this because page is invalid or YouTube changed their internal extractor")
-
-        try:
-            data = json.loads(data) # redefining data here
-
-            self.results: list[Union[Video, Channel]] = [] # results list, clears if it was already filled with items
-            self.found: int = data["estimatedResults"] # estimated results count
-            
-            section_lists = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
-
-            for section_list in section_lists:
-                if "itemSectionRenderer" not in section_list: continue
-                for content in section_list["itemSectionRenderer"]["contents"]:
-                    try:
-                        try:
-                            # trying to get it here to skip doubling later
-                            account_type = content["videoRenderer"]["ownerBadges"][0]["metadataBadgeRenderer"]["style"]
-                        except:
-                            account_type = "regular"
-                        if "videoRenderer" in content.keys():
-                            self.results.append(
-                                Video(
-                                    content["videoRenderer"]["videoId"],
-                                    content["videoRenderer"]["title"]["runs"][0]["text"],
-                                    content["videoRenderer"]["ownerText"]["runs"][0]["text"],
-                                    content["videoRenderer"]["lengthText"]["simpleText"],
-                                    content["videoRenderer"]["viewCountText"]["simpleText"],
-                                    content["videoRenderer"]["publishedTimeText"]["simpleText"],
-                                    content["videoRenderer"]["thumbnail"]["thumbnails"][-1]["url"], # best quality
-                                    content["videoRenderer"]["channelThumbnailSupportedRenderers"]["channelThumbnailWithLinkRenderer"]["thumbnail"]["thumbnails"][0]["url"],
-                                    content["videoRenderer"]["detailedMetadataSnippets"][0]["snippetText"]["runs"][0]["text"],
-                                    account_type
-                                )
-                            )
-                        
-                        elif "channelRenderer" in content.keys():
-                            self.results.append(
-                                Channel(
-                                    content["channelRenderer"]["channelId"],
-                                    content["channelRenderer"]["title"]["simpleText"],
-                                    content["channelRenderer"]["videoCountText"]["accessibility"]["accessibilityData"]["label"],
-                                    content["channelRenderer"]["thumbnail"]["thumbnails"][0]["url"], # starts with //
-                                    account_type
-                                )
-                            )
-                    except:
-                        continue
-        except:
-            raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+        # parses YouTube response
+        self.results: list[Union[Video, Channel]] = youtube_search_parse(data)
+        self.found = data["estimatedResults"] # TODO fix, can raise unclear exceptions if this field does not exits
