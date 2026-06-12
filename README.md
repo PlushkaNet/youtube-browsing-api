@@ -13,7 +13,7 @@ pip install git+https://github.com/PlushkaNet/youtube_browsing_api@dev
 
 <b>📜 Suggestion queries usage example:</b>
 ```
-from yt_browsing_api import get_suggest_queries
+from youtube_browsing_api import get_suggest_queries
 
 queries: list[str] | None = get_suggest_queries("NCS")
 
@@ -23,7 +23,7 @@ for i in range(len(queries)):
 
 <b>🔎 Search usage example:</b>
 ```
-from yt_browsing_api import Search
+from youtube_browsing_api import Search
 
 results = search("NCS")
 
@@ -33,7 +33,7 @@ print(results.results) # list of videos and channels
 
 <b>🔎 Exploring channels usage example:</b>
 ```
-from yt_browsing_api import GetChannelInfo
+from youtube_browsing_api import GetChannelInfo
 
 chan = GetChannelInfo("NoCopyrightSounds")
 

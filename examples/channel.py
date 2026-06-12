@@ -2,7 +2,7 @@
 Get channel info API usage example
 """
 
-from yt_browsing_api import GetChannelInfo
+from youtube_browsing_api import GetChannelInfo
 
 try:
     chan = GetChannelInfo("NoCopyrightSounds")

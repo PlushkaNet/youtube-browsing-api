@@ -2,7 +2,7 @@
 Search API usage example
 """
 
-from yt_browsing_api import Search, Video, Channel, Languages, Regions
+from youtube_browsing_api import Search, Video, Channel, Languages, Regions
 
 try:
     results = Search("NCS")
