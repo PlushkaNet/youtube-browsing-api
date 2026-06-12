@@ -4,7 +4,7 @@ from typing import Optional
 from .innertube import Innertube, InnertubeRequest
 from .parsers import youtube_channel_parse, youtube_channel_description_parse
 from .html_scrapper import scrap_request, GOOGLEBOT_HEADERS, ScrapResponseData
-from .enums import Languages, Regions
+from .enums import Languages
 from .types import ChannelDescription
 
 class GetChannelInfo:
@@ -13,22 +13,18 @@ class GetChannelInfo:
     In difference from Channel, ChannelInfo contains advanced info about channel, unavaliable from search
 
     Fields:
-    - title      [str]
-    - subs_count [str]
-    - thumbnail  [str]
-    - short_desc [str]
-    - desc       [ChannelDescription | None]
-    - banner_img [str]
-
-    [title] is a channel title
-    [subs_count] is a counter with word quantifiers how many subscribers does channel have, often looks like: "123 million subscribers"
-    [thumbnail] is a channel's image url in high quality
-    [short_desc] is a channel's small part of description
-    [desc] is a channel's descrition object if initialized by calling fetch_description(), or None (by default)
-    [banner_img] is a channel's header banner image url in hight quality
+    `title` is a channel title
+    `subs_count` is a counter with word quantifiers how many subscribers does channel have, often looks like: "123 million subscribers"
+    `thumbnail` is a channel's image url in high quality
+    `short_desc` is a channel's small part of description
+    `desc` is a channel's description
+    `full_desc` is a channel's descrition object if initialized by calling fetch_description(), or None (by default)
+    `banner_img` is a channel's header banner image url in hight quality
+    `channel_id` is a channel's ID like UC_aEa8K-EOJ3D6gOs7HcyNg (NCS)
+    `channel_url` is a channel's URL like https://www.youtube.com/channel/UC_aEa8K-EOJ3D6gOs7HcyNg (NCS)
+    `vanity_channel_url` is a channel's URL like https://www.youtube.com/@NoCopyrightSounds
+    `keywords` is a channel's related keywords
     """
-
-    # __slots__ = ["title", "subs_count", "thumbnail", "desc", "short_desc", "banner_img", "_innertube", "_data"]
 
     def __init__(self, channel: str, language=Languages.EN, timeout=5.0, headers: dict = GOOGLEBOT_HEADERS):
         """

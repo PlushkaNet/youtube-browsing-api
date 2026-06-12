@@ -45,9 +45,9 @@ print(chan.banner_img) # can be None
 
 chan.fetch_description()
 
-print(chan.desc.text)
-print(chan.desc.join_date)
-print(chan.desc.region)
+print(chan.full_desc.text)
+print(chan.full_desc.join_date)
+print(chan.full_desc.region)
 ```
 
 <h3>📚 Complete examples can be found in <a href="examples/">examples/</a> directory</h3>
