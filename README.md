@@ -1,4 +1,5 @@
-<center><h2>🔎 Youtube browsing API</h2></center>
+<h1>🔎 Youtube browsing API</h1>
+<i>Uses both document parsing and InnerTube API to fetch data from YouTube</i>
 
 ## 🔥 Quick start
 Install stable package version via pip using:

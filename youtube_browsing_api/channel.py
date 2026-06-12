@@ -1,9 +1,9 @@
 """ File containing code for YouTube channels operations """
 
 from typing import Optional
-import json
-import requests
-
+from .innertube import Innertube, InnertubeRequest
+from .parsers import youtube_channel_parse, youtube_channel_description_parse
+from .html_scrapper import scrap_request, GOOGLEBOT_HEADERS, ScrapResponseData
 from .enums import Languages, Regions
 from .types import ChannelDescription
 
@@ -16,162 +16,97 @@ class GetChannelInfo:
     - title      [str]
     - subs_count [str]
     - thumbnail  [str]
+    - short_desc [str]
     - desc       [ChannelDescription | None]
     - banner_img [str]
 
     [title] is a channel title
     [subs_count] is a counter with word quantifiers how many subscribers does channel have, often looks like: "123 million subscribers"
-    [thumbnail] is a channel image url in high quality
-    [desc] is a channel descrition object if initialized by calling fetch_description(), or None (by default)
+    [thumbnail] is a channel's image url in high quality
+    [short_desc] is a channel's small part of description
+    [desc] is a channel's descrition object if initialized by calling fetch_description(), or None (by default)
     [banner_img] is a channel's header banner image url in hight quality
-
-    Secured fields:
-    - _url                     # YouTube channel URL
-    - _desc_continuation_token # Continuation token for fetching full channel description
-    - _cookies                 # Response cookies from YouTube
-    - _headers                 # Request headers
     """
 
-    __slots__ = ["title", "subs_count", "thumbnail", "desc", "banner_img", "_url", "_desc_continuation_token", "_cookies", "_headers"]
+    # __slots__ = ["title", "subs_count", "thumbnail", "desc", "short_desc", "banner_img", "_innertube", "_data"]
 
-    def _make_url(self, query: str) -> str:
-        """ Internal method for prepare channel url to fetch from """
-        return "https://www.youtube.com/@" + query.removeprefix("@")
-    
-
-    def __init__(self, channel_id: str, language=Languages.EN, timeout=5.0):
+    def __init__(self, channel: str, language=Languages.EN, timeout=5.0, headers: dict = GOOGLEBOT_HEADERS):
         """
         Initializes class object by performing a request to the channel page
         Arguments:
-        - channel_id [required]
+        - channel    [required]
         - language   [optional], default = "en"
         - timeout    [optional], default = 5.0
+        - headers    [optional], default = GOOGLEBOT_HEADERS
+        
+        `channel` can be valid YouTube URL to channel, @Username or channel ID like `UC_aEa8K-EOJ3D6gOs7HcyNg` (NCS)"
+
+        `headers` are used only if performing a request to HTML document to parse
 
         Returns completed GetChannelInfo on success
         Raises exception on failure
         """
-
-        # googlebot user agent; saves it for future use
-        # TODO add headers switch
-        self._headers= {
-            "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
-            "Accept-Language": language
-        }
-
-        # makes valid youtube channel url to fetch from and saves it for future use
-        self._url = self._make_url(channel_id)
-
-        response = requests.get(
-            self._url,
-            headers=self._headers,
-            timeout=timeout
-        )
-
-        if response.status_code != 200:
-            raise Exception(f"Get page response status code is {response.status_code}")
         
-        # TODO merge parsing for search and get_channel into single parse method
+        self._innertube = Innertube(hl=language, timeout=timeout) # initializing Innertube client for future use
 
-        try: # Old YouTube parsing
-            data = response.text[response.text.index("ytInitialData")+16::]
-            data = data[:data.index('</script>')-1]
-        except ValueError: # Scraper-compatible YouTube parsing
-            data = response.text[response.text.index("// scraper_data_begin")+42::]
-            data = data[:data.index('// scraper_data_end')-3]
-
-        try:
-            data = json.loads(data)
-
-            # trying to get banner image url if it exists
-            try:
-                self.banner_img: Optional[str] = data['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']['banner']['imageBannerViewModel']['image']['sources'][0]['url']
-            except:
-                self.banner_img: Optional[str] = None
+        if channel.startswith("http") or channel.startswith("@"):
+            # processing with scrap-document request
+            if channel.startswith("@"):
+                url: str = "https://www.youtube.com/" + channel
+            else:
+                url: str = channel
             
-            # page_header_view_model["description"]["descriptionPreviewViewModel"]["description"]["content"] # small description part (starting str)
+            scrap_response: ScrapResponseData = scrap_request(url, headers, language, timeout)
 
-            header_content = data['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']
-            
-            self._desc_continuation_token: str = header_content["description"]["descriptionPreviewViewModel"]["rendererContext"]["commandContext"]["onTap"]["innertubeCommand"]["showEngagementPanelEndpoint"]["engagementPanel"]["engagementPanelSectionListRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
-            self._cookies = response.cookies
+            data = scrap_response.data
+            self._innertube.cookies = scrap_response.cookies # saving cookies for future use
+        else:
+            # processing with InnerTube request
+            request: InnertubeRequest = self._innertube.make_request("browse")
+            request["browseId"] = channel
 
-            self.title      :str = header_content['title']['dynamicTextViewModel']['text']['content']
-            self.subs_count :str = header_content['metadata']['contentMetadataViewModel']['metadataRows'][1]['metadataParts'][0]['text']['content']
-            self.thumbnail  :str = data['microformat']['microformatDataRenderer']['thumbnail']['thumbnails'][0]['url']
-
-            self.desc: Optional[ChannelDescription] = None
-        except Exception as e:
-            raise Exception(f"Parsing error: {e}")
-
+            data = request.perform()
+            self._innertube.cookies = request.cookies
         
-    def fetch_description(self, language=Languages.EN, region=Regions.US, timeout=5.0):
+        # parse data
+        channel_info = youtube_channel_parse(data)
+        # extracting dict fields into class object's fields
+        self.title: str = channel_info["title"]
+        self.subs_count: str = channel_info["subs_count"]
+        self.thumbnail: str = channel_info["thumbnail"]
+        self.short_desc: str = channel_info["short_desc"]
+        self.desc: str = channel_info["desc"]
+        self.banner_img: str = channel_info["banner_img"]
+        self.channel_id: str = channel_info["channel_id"]
+        self.channel_url: str = channel_info["channel_url"]
+        self.keywords: str = channel_info["keywords"]
+        self.vanity_channel_url: str = channel_info["vanity_channel_url"]
+
+        self.full_desc: Optional[ChannelDescription] = None
+
+        self._data = channel_info # save for future use
+        
+    def fetch_description(self):
         """
-        Fetches channel descritpion and saves it to [desc] field
-        [desc] field have type of ChannelDescription or None (if failed)
-        Arguments:
-        - channel_id [required]
-        - language   [optional], default = "en"
-        - timeout    [optional], default = 5.0
-
+        Fetches channel descritpion and saves it to `full_desc` field
+        `full_desc` field have type of ChannelDescription or None (if failed)
         Returns self if success
         Raises an exception on failure
         """
 
-        # reassign Accept-Language field in local headers to be up-to-date with new [language] arg
-        headers = self._headers
-        headers["Accept-Language"] = language
-
         try:
-            rollout_token   : str = self._cookies["__Secure-ROLLOUT_TOKEN"]
-            visitor_metadata: str = self._cookies["VISITOR_PRIVACY_METADATA"]
-        except:
-            raise Exception("Cannot get required credentials from cookies")
-        
-        # JSON payload for fetching channel full desctiption
-        post_data = {
-            "context": {
-                "client": {
-                    "browserName": "Chrome",
-                    "browserVersion": "148.0.0.0",
-                    "clientFormFactor": "UNKNOWN_FORM_FACTOR",
-                    "clientName": "WEB",
-                    "clientVersion": "2.20260606.02.00", # some client
-                    "gl": region.upper(),
-                    "hl": language,
-                    "mainAppWebInfo": {
-                        "graftUrl": self._url
-                    },
-                    "rolloutToken": rollout_token,
-                    "visitorData": visitor_metadata
-                },
-                "request": {
-                    "useSsl": True
-                }
-            },
-            "continuation": self._desc_continuation_token
-        }
-    
-        response = requests.post(
-            "https://www.youtube.com/youtubei/v1/browse?prettyPrint=false",
-            cookies=self._cookies,
-            headers=headers,
-            json=post_data
-        )
+            request: InnertubeRequest = self._innertube.make_request("browse")
+            request["context"]["client"]["mainAppWebInfo"] = {
+                "graftUrl": self.vanity_channel_url
+            }
+            request["context"]["client"]["rolloutToken"] = self._innertube.cookies["__Secure-ROLLOUT_TOKEN"]
+            request["context"]["client"]["visitorData"] = self._innertube.cookies["VISITOR_PRIVACY_METADATA"]
+            request["continuation"] = self._data["_desc_continuation_token"]
+        except: # TODO create a special exception for this case
+            raise Exception("Cannot make InnerTube request\nThis often happens of lack of cookies data from YouTube's response")
 
-        if response.status_code != 200:
-            raise Exception(f"Response status is {response.status_code}")
+        data = request.perform()
 
-        data = json.loads(response.text)
-
-        try:
-            metadata = data["onResponseReceivedEndpoints"][0]["appendContinuationItemsAction"]["continuationItems"][0]["aboutChannelRenderer"]["metadata"]["aboutChannelViewModel"]
-
-            self.desc = ChannelDescription(
-                metadata["description"],
-                metadata["joinedDateText"]["content"],
-                metadata["country"]
-            )
-        except:
-            raise Exception("Failed to parse response from YouTube. Probably its because they have updated their extraction scheme")
+        self.full_desc: ChannelDescription = youtube_channel_description_parse(data)
 
         return self
