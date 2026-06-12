@@ -3,6 +3,11 @@ requires = ["hatchling >= 1.26"]
 build-backend = "hatchling.build"
 
 [project]
+keywords = [
+    "youtube",
+    "api",
+    "youtube-api"
+]
 name = "youtube-browsing-api"
 dynamic = ["version"]
 description = "Browsing only (no video download) simple youtube API"
@@ -20,7 +25,7 @@ dependencies = [
 Source = "https://github.com/PlushkaNet/youtube-browsing-api"
 
 [tool.hatch.version]
-path = "yt_browsing_api/__init__.py"
+path = "youtube_browsing_api/__init__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["yt_browsing_api"]
+packages = ["youtube_browsing_api"]

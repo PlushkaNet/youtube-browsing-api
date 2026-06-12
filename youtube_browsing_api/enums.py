@@ -21,28 +21,28 @@ class Languages:
 # TODO add more regions
 class Regions:
     """ Class serving YouTube-supported regions """
-    US :Final[str] = "us" # United States
-    GB :Final[str] = "gb" # United Kingdom
-    AR :Final[str] = "ar" # Argentina
-    AM :Final[str] = "am" # Armenia
-    AU :Final[str] = "au" # Australia
-    AT :Final[str] = "at" # Austria
-    AZ :Final[str] = "az" # Azerbaijan
-    BY :Final[str] = "by" # Belarus
-    BR :Final[str] = "br" # Brazil
-    CA :Final[str] = "ca" # Canada
-    CL :Final[str] = "cl" # Chile
-    FR :Final[str] = "fr" # France
-    DE :Final[str] = "de" # Germany
-    EG :Final[str] = "eg" # Egypt
-    IN :Final[str] = "in" # India
-    JP :Final[str] = "jp" # Japan
-    IT :Final[str] = "it" # Italy
-    RU :Final[str] = "ru" # Russia
-    KZ :Final[str] = "kz" # Kazakhstan
-    UA :Final[str] = "ua" # Ukraine
-    AE :Final[str] = "ae" # United Arab Imirates
-    ES :Final[str] = "es" # Spain
+    US :Final[str] = "US" # United States
+    GB :Final[str] = "GB" # United Kingdom
+    AR :Final[str] = "AR" # Argentina
+    AM :Final[str] = "AM" # Armenia
+    AU :Final[str] = "AU" # Australia
+    AT :Final[str] = "AT" # Austria
+    AZ :Final[str] = "AZ" # Azerbaijan
+    BY :Final[str] = "BY" # Belarus
+    BR :Final[str] = "BR" # Brazil
+    CA :Final[str] = "CA" # Canada
+    CL :Final[str] = "CL" # Chile
+    FR :Final[str] = "FR" # France
+    DE :Final[str] = "DE" # Germany
+    EG :Final[str] = "EG" # Egypt
+    IN :Final[str] = "IN" # India
+    JP :Final[str] = "JP" # Japan
+    IT :Final[str] = "IT" # Italy
+    RU :Final[str] = "RU" # Russia
+    KZ :Final[str] = "KZ" # Kazakhstan
+    UA :Final[str] = "UA" # Ukraine
+    AE :Final[str] = "AE" # United Arab Imirates
+    ES :Final[str] = "ES" # Spain
 
 class AccountTypes:
     """ Enum with account types for channels """
