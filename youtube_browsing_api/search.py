@@ -1,12 +1,12 @@
-""" File containing code for YouTube search operations using InnerTube API """
+""" File containing code for YouTube search operations using both InnerTube API and parsing """
 
-from typing import Union
+from typing import Union, Any
 from urllib import parse
 from .html_scrapper import scrap_request, ScrapResponseData, GOOGLEBOT_HEADERS
 from .types import Video, Channel
 from .enums import Languages, Regions
-from .innertube import Innertube
-from .parsers import youtube_search_parse
+from .innertube import Innertube, InnertubeRequest
+from .parsers import youtube_search_parse, youtube_search_continuation_parse
 
 class Search:
     """
@@ -31,7 +31,7 @@ class Search:
 
         return results
 
-    def __init__(self, query: str, language=Languages.EN, region=Regions.US, timeout=5.0):
+    def __init__(self, query: str, language=Languages.EN, region=Regions.US, timeout=5.0): # TODO update doc
         """
         Initializes class object by performing a search request to YouTube
         Arguments:
@@ -54,6 +54,26 @@ class Search:
 
         self._search()
 
+    def __process_innertube_request(self, request: InnertubeRequest, parser): # TODO add doc
+        data = request.perform()
+        self._innertube.cookies = request.cookies
+
+        # parses YouTube response
+        self._data: dict[str, Any] = parser(data)
+        self.results: list[Union[Video, Channel]] = self._data["results"]
+        self.found = self._data["estimated_results"]
+        self._continuation = self._data["_continuation"]
+
+    def next(self): # TODO improve doc
+        """ Fetches next results """
+
+        request = self._innertube.make_request("search")
+        request["continuation"] = self._continuation
+        request["context"]["client"]["mainAppWebInfo"] = {
+            "graftUrl": "https://www.youtube.com/results?search_query=" + parse.quote(self._query, safe="")
+        }
+        self.__process_innertube_request(request, youtube_search_continuation_parse)
+
     def _search(self):
         """
         Internal search method, use .next() method if you want to get next search results,
@@ -67,12 +87,7 @@ class Search:
 
         request = self._innertube.make_request("search")
         request["query"] = self._query # sets search query
-        data = request.perform() # performes a request to YouTube InnerTube API
-        self._innertube.cookies = request.cookies # updates cookies
-
-        # parses YouTube response
-        self.results: list[Union[Video, Channel]] = youtube_search_parse(data)
-        self.found = data["estimatedResults"] # TODO fix, can raise unclear exceptions if this field does not exits
+        self.__process_innertube_request(request, youtube_search_parse)
 
 
 class SearchFromDocument:

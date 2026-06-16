@@ -30,6 +30,10 @@ results = search("NCS")
 
 print(results.found)   # prints how much entries are there
 print(results.results) # list of videos and channels
+
+results.next() # fetch next results
+
+print(results.results) # new results
 ```
 
 <b>🔎 Exploring channels usage example:</b>
@@ -66,10 +70,9 @@ print(chan.full_desc.region)
 - Recent videos
 - All videos
 - Playlists
-- External platforms links in description support
 
-<b>🛠️ In development (search) </b>
-- .next() method (to fetch results from next page automatically)
+<b>🛠️ In development (internal):</b>
+- Increase persistence of parsers
 
 <br>
 <i>If you find this project helpful, please consider giving it a ⭐</i>

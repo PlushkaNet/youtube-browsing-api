@@ -1,59 +1,77 @@
 """ File containing code for different parsers """
 
-from typing import Union
+from typing import Union, Any
 from .types import Video, Channel, ParserError, ChannelDescription, LinkIcon
 
-def youtube_search_parse(data: dict) -> list[Union[Video, Channel]]:
-    """ YouTube search deafault (and single for now) parsing method """
-    results: list[Union[Video, Channel]] = []
+def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]:
+    """
+    Parses videos and channels from itemSectionRenderer.contents
+    Cannot raise an exception
+    """
+    results = []
 
-    try:
-        section_lists = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
+    for sectionRenderer in contents:
+        try:
+            if "videoRenderer" in sectionRenderer:
+                video_renderer = sectionRenderer["videoRenderer"]
+                results.append(
+                    Video(
+                        video_renderer["videoId"],
+                        video_renderer["title"]["runs"][0]["text"],
+                        video_renderer["ownerText"]["runs"][0]["text"],
+                        video_renderer["lengthText"]["simpleText"],
+                        video_renderer["viewCountText"]["simpleText"],
+                        video_renderer["publishedTimeText"]["simpleText"],
+                        video_renderer["thumbnail"]["thumbnails"][-1]["url"], # best quality
+                        video_renderer["channelThumbnailSupportedRenderers"]["channelThumbnailWithLinkRenderer"]["thumbnail"]["thumbnails"][0]["url"],
+                        video_renderer["detailedMetadataSnippets"][0]["snippetText"]["runs"][0]["text"],
+                        video_renderer.get("ownerBadges", [{}])[0].get("metadataBadgeRenderer", {}).get("style", "regular")
+                    )
+                )
 
-        for section_list in section_lists:
-            if "itemSectionRenderer" not in section_list:
-                continue
-            for content in section_list["itemSectionRenderer"]["contents"]:
-                try:
-                    try:
-                        # trying to get it here to skip doubling later
-                        account_type = content["videoRenderer"]["ownerBadges"][0]["metadataBadgeRenderer"]["style"]
-                    except:
-                        account_type = "regular"
-                    if "videoRenderer" in content.keys():
-                        results.append(
-                            Video(
-                                content["videoRenderer"]["videoId"],
-                                content["videoRenderer"]["title"]["runs"][0]["text"],
-                                content["videoRenderer"]["ownerText"]["runs"][0]["text"],
-                                content["videoRenderer"]["lengthText"]["simpleText"],
-                                content["videoRenderer"]["viewCountText"]["simpleText"],
-                                content["videoRenderer"]["publishedTimeText"]["simpleText"],
-                                content["videoRenderer"]["thumbnail"]["thumbnails"][-1]["url"], # best quality
-                                content["videoRenderer"]["channelThumbnailSupportedRenderers"]["channelThumbnailWithLinkRenderer"]["thumbnail"]["thumbnails"][0]["url"],
-                                content["videoRenderer"]["detailedMetadataSnippets"][0]["snippetText"]["runs"][0]["text"],
-                                account_type
-                            )
-                        )
-                    
-                    elif "channelRenderer" in content.keys():
-                        results.append(
-                            Channel(
-                                content["channelRenderer"]["channelId"],
-                                content["channelRenderer"]["title"]["simpleText"],
-                                content["channelRenderer"]["videoCountText"]["accessibility"]["accessibilityData"]["label"],
-                                content["channelRenderer"]["thumbnail"]["thumbnails"][0]["url"], # starts with //
-                                account_type
-                            )
-                        )
-                except:
-                    continue
-    except KeyError:
-        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+            elif "channelRenderer" in sectionRenderer:
+                channel_renderer = sectionRenderer["channelRenderer"]
+                results.append(
+                    Channel(
+                        channel_renderer["channelId"],
+                        channel_renderer["title"]["simpleText"],
+                        channel_renderer["videoCountText"]["accessibility"]["accessibilityData"]["label"],
+                        channel_renderer["thumbnail"]["thumbnails"][0]["url"], # starts with //
+                        channel_renderer.get("ownerBadges", [{}])[0].get("metadataBadgeRenderer", {}).get("style", "regular")
+                    )
+                )
+        except:
+            continue
 
     return results
 
-def youtube_channel_parse(data: dict) -> dict:
+def youtube_search_parse(data: dict) -> dict[str, Any]:
+    """ YouTube search default (and single for now) parsing method """
+    result = {}
+
+    try:
+        result["estimated_results"] = data["estimatedResults"]
+        contents = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
+        result["results"] = youtube_search_contents_parse(contents[0]["itemSectionRenderer"]["contents"])
+        result["_continuation"] = contents[1]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
+    except KeyError:
+        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+
+    return result
+
+def youtube_search_continuation_parse(data: dict) -> dict[str, Any]:
+    result = {}
+
+    try:
+        result["estimated_results"] = data["estimatedResults"]
+        result["results"] = youtube_search_contents_parse(data["onResponseReceivedCommands"][0]["appendContinuationItemsAction"]["continuationItems"][0]["itemSectionRenderer"]["contents"])
+        result["_continuation"] = data["onResponseReceivedCommands"][0]["appendContinuationItemsAction"]["continuationItems"][1]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
+    except KeyError:
+        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+
+    return result
+
+def youtube_channel_parse(data: dict) -> dict[str, Any]:
     """
     Parses channel from YouTube
     Returns complete dict of parsed entities
