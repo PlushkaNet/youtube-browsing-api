@@ -71,6 +71,12 @@ def youtube_search_continuation_parse(data: dict) -> dict[str, Any]:
 
     return result
 
+def youtube_search_fallback_parse(data: dict) -> dict[str, Any]:
+    try:
+        return youtube_search_parse(data)
+    except ParserError:
+        return youtube_search_continuation_parse(data)
+
 def youtube_channel_parse(data: dict) -> dict[str, Any]:
     """
     Parses channel from YouTube

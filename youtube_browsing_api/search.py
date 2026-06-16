@@ -6,7 +6,7 @@ from .html_scrapper import scrap_request, ScrapResponseData, GOOGLEBOT_HEADERS
 from .types import Video, Channel
 from .enums import Languages, Regions
 from .innertube import Innertube, InnertubeRequest
-from .parsers import youtube_search_parse, youtube_search_continuation_parse
+from .parsers import youtube_search_fallback_parse
 
 class Search:
     """
@@ -72,7 +72,7 @@ class Search:
         request["context"]["client"]["mainAppWebInfo"] = {
             "graftUrl": "https://www.youtube.com/results?search_query=" + parse.quote(self._query, safe="")
         }
-        self.__process_innertube_request(request, youtube_search_continuation_parse)
+        self.__process_innertube_request(request, youtube_search_fallback_parse)
 
     def _search(self):
         """
@@ -87,7 +87,7 @@ class Search:
 
         request = self._innertube.make_request("search")
         request["query"] = self._query # sets search query
-        self.__process_innertube_request(request, youtube_search_parse)
+        self.__process_innertube_request(request, youtube_search_fallback_parse)
 
 
 class SearchFromDocument:
@@ -168,5 +168,5 @@ class SearchFromDocument:
         """
         scrap_response: ScrapResponseData = scrap_request(self._url, self._headers, self._language, self._timeout)
 
-        self.results: list[Union[Video, Channel]] = youtube_search_parse(scrap_response.data) # results list, clears if it was already filled with items
+        self.results: list[Union[Video, Channel]] = youtube_search_fallback_parse(scrap_response.data) # results list, clears if it was already filled with items
         self.found: int = scrap_response.data["estimatedResults"] # estimated results count

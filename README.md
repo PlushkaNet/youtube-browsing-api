@@ -71,6 +71,9 @@ print(chan.full_desc.region)
 - All videos
 - Playlists
 
+<b>🛠️ In development (search):</b>
+- Search filters
+
 <b>🛠️ In development (internal):</b>
 - Increase persistence of parsers
 
