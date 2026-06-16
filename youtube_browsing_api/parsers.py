@@ -1,7 +1,7 @@
 """ File containing code for different parsers """
 
 from typing import Union
-from .types import Video, Channel, ParserError, ChannelDescription
+from .types import Video, Channel, ParserError, ChannelDescription, LinkIcon
 
 def youtube_search_parse(data: dict) -> list[Union[Video, Channel]]:
     """ YouTube search deafault (and single for now) parsing method """
@@ -48,11 +48,10 @@ def youtube_search_parse(data: dict) -> list[Union[Video, Channel]]:
                         )
                 except:
                     continue
-    except:
+    except KeyError:
         raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
 
     return results
-
 
 def youtube_channel_parse(data: dict) -> dict:
     """
@@ -86,7 +85,7 @@ def youtube_channel_parse(data: dict) -> dict:
         result["keywords"] = metadata["keywords"]
         result["channel_url"] = metadata["channelUrl"]
         result["vanity_channel_url"] = metadata["vanityChannelUrl"]
-    except:
+    except KeyError:
         raise ParserError(f"Channel parsing failed\nProbably this because YouTube changed their data endpoints")
 
     return result
@@ -101,10 +100,28 @@ def youtube_channel_description_parse(data: dict) -> ChannelDescription:
     try:
         metadata = data["onResponseReceivedEndpoints"][0]["appendContinuationItemsAction"]["continuationItems"][0]["aboutChannelRenderer"]["metadata"]["aboutChannelViewModel"]
 
+        # parse icons
+        try:
+            link_icons: list[LinkIcon] = []
+            for link in metadata["links"]:
+                icons: dict[str, str] = {}
+                for source in link["channelExternalLinkViewModel"]["favicon"]["sources"]:
+                    icons[f"{source['width']}x{source['height']}"] = source["url"]
+                link_icons.append(
+                    LinkIcon(
+                        link["channelExternalLinkViewModel"]["title"]["content"],
+                        link["channelExternalLinkViewModel"]["link"]["content"],
+                        icons
+                    )
+                )
+        except KeyError:
+            link_icons = None
+
         return ChannelDescription(
-            metadata["description"],
+            metadata.get("description", None),
             metadata["joinedDateText"]["content"],
-            metadata["country"]
+            metadata.get("country", None),
+            link_icons
         )
     except:
-        raise ParserError(f"Channel full description parsing failed\nProbably this because YouTube changed their data endpoints")
+       raise ParserError(f"Channel full description parsing failed\nProbably this because YouTube changed their data endpoints")

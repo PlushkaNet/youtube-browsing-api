@@ -13,7 +13,6 @@ from .enums import Languages, Regions
 def _clear_google_response(resp:str) -> str:
     return resp.removeprefix('window.google.ac.h(').removesuffix(')')
 
-
 # parses only text queries
 def parse_text_queries(text_json:str) -> Optional[List[str]]:
     try:
@@ -37,7 +36,6 @@ def parse_text_queries(text_json:str) -> Optional[List[str]]:
             queries.append(i[0])
 
     return queries
-
 
 def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, timeout=5.0) -> Optional[List[str]]:
     """

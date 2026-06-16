@@ -13,17 +13,17 @@ class GetChannelInfo:
     In difference from Channel, ChannelInfo contains advanced info about channel, unavaliable from search
 
     Fields:
-    `title` is a channel title
-    `subs_count` is a counter with word quantifiers how many subscribers does channel have, often looks like: "123 million subscribers"
-    `thumbnail` is a channel's image url in high quality
-    `short_desc` is a channel's small part of description
-    `desc` is a channel's description
-    `full_desc` is a channel's descrition object if initialized by calling fetch_description(), or None (by default)
-    `banner_img` is a channel's header banner image url in hight quality
+    `title` is a channel title from YouTube
+    `subs_count` is a counter with word quantifiers how many subscribers does channel have, example: "123 million subscribers"
+    `thumbnail` is a channel's image url to internal YouTube storage in high quality
+    `short_desc` is a channel's small part of description. It appears at channel preview on YouTube, example: "NCS is on a mission to soundtrack the internet. 🚀", but full description is much larger
+    `desc` is a channel's description. Can be empty string if author didn't set their's channel description
+    `full_desc` is a channel's descrition object. It's None by default, because requires to fetch some additional data. Can be requested by calling fetch_description()
+    `banner_img` is a channel's header banner image url in hight quality. Can be None if channel doesn't have banner
     `channel_id` is a channel's ID like UC_aEa8K-EOJ3D6gOs7HcyNg (NCS)
     `channel_url` is a channel's URL like https://www.youtube.com/channel/UC_aEa8K-EOJ3D6gOs7HcyNg (NCS)
     `vanity_channel_url` is a channel's URL like https://www.youtube.com/@NoCopyrightSounds
-    `keywords` is a channel's related keywords
+    `keywords` are channel's related keywords, example: ["music songs ncs", "no copyright music", "edm", "copyright free music"]
     """
 
     def __init__(self, channel: str, language=Languages.EN, timeout=5.0, headers: dict = GOOGLEBOT_HEADERS):
@@ -66,6 +66,7 @@ class GetChannelInfo:
         
         # parse data
         channel_info = youtube_channel_parse(data)
+        
         # extracting dict fields into class object's fields
         self.title: str = channel_info["title"]
         self.subs_count: str = channel_info["subs_count"]
@@ -90,16 +91,11 @@ class GetChannelInfo:
         Raises an exception on failure
         """
 
-        try:
-            request: InnertubeRequest = self._innertube.make_request("browse")
-            request["context"]["client"]["mainAppWebInfo"] = {
-                "graftUrl": self.vanity_channel_url
-            }
-            request["context"]["client"]["rolloutToken"] = self._innertube.cookies["__Secure-ROLLOUT_TOKEN"]
-            request["context"]["client"]["visitorData"] = self._innertube.cookies["VISITOR_PRIVACY_METADATA"]
-            request["continuation"] = self._data["_desc_continuation_token"]
-        except: # TODO create a special exception for this case
-            raise Exception("Cannot make InnerTube request\nThis often happens of lack of cookies data from YouTube's response")
+        request: InnertubeRequest = self._innertube.make_request("browse")
+        request["context"]["client"]["mainAppWebInfo"] = {
+            "graftUrl": self.vanity_channel_url
+        }
+        request["continuation"] = self._data["_desc_continuation_token"]
 
         data = request.perform()
 
