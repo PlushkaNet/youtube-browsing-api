@@ -5,7 +5,7 @@ Get channel info API usage example
 from youtube_browsing_api import GetChannelInfo
 
 try:
-    chan = GetChannelInfo("@NoCopyrightSounds")
+    chan = GetChannelInfo("UC_aEa8K-EOJ3D6gOs7HcyNg")
 except Exception as e:
     print("Cannot fetch channel info :(")
     print(f"Reason:\n{e}")
@@ -26,10 +26,9 @@ if chan:
 
 try:
     chan.fetch_description()
+    print(chan.full_desc.text)      # Channel's full description
+    print(chan.full_desc.join_date) # Channel's join date
+    print(chan.full_desc.region)    # Channel's region
 except Exception as e:
     print("Cannot fetch channel's description :(")
     print(f"Reason:\n{e}")
-
-print(chan.full_desc.text)      # Channel's full description
-print(chan.full_desc.join_date) # Channel's join date
-print(chan.full_desc.region)    # Channel's region

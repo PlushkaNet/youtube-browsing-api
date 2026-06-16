@@ -1,25 +1,26 @@
 """ File containing code for common exceptions and YouTube entries objects """
 
+from typing import Optional
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
+
+# marked for future use
+class InnerTubeAPIRequestError(Exception):
+    pass
 
 class ExtractorError(Exception):
     pass
 
-
 class ParserError(Exception):
     pass
 
-
 class JSONParsingError(Exception):
     pass
-
 
 class InvalidStatusError(Exception):
     def __init__(self, status_code: int):
         self.status_code = status_code
         super().__init__(f"Status code is {status_code}")
-
 
 def _translate_account_type(account_type: str) -> str:
     """ Translates account type to internal StrEnum type """
@@ -31,7 +32,6 @@ def _translate_account_type(account_type: str) -> str:
         account_type = AccountTypes.REGULAR
     
     return account_type
-
 
 class Video:
     """
@@ -127,7 +127,6 @@ class Video:
             +"account_type"      + "='" +self.account_type      + "'"   \
             +")"
 
-
 @dataclass
 class Channel:
     id           :str
@@ -146,16 +145,35 @@ class Channel:
         """ Returns Channel as a JSON-like object """
         return asdict(self)
 
+@dataclass
+class LinkIcon:
+    """
+    Class representing link icons in channel full description
+    `title` serves link title from the author
+    `resourse_url` serves original URL to resourse from author
+    `icons` serves dictionary in format resolution:url
+
+    More about `icons` field:
+    resolution (dictionary key) example: "64x64", where first "64" - width, second "64" - height
+    url is url to internal google storage with icon
+    """
+    title        :str
+    resourse_url :str
+    icons        :dict[str, str]
 
 @dataclass
 class ChannelDescription:
     """
     Class representing channel's description
+    `text` representing full description text from author. Can be None for small channels and channels without complete description
+    `join_date` is a string from YouTube representing a date when channel was joined, example: "Joined Aug 14, 2011"
+    `region` is a string from YouTube that represents a region where channel was registered, example: "United Kingdom". Can be None for specific channels
+    `link_regions` is list of links that author attached to their's channel description. Can be None for small channels and channels without complete description
     """
-    text      :str
-    join_date :str
-    region    :str
-    # urls to be added here
+    text       :Optional[str]
+    join_date  :str
+    region     :Optional[str]
+    link_icons :Optional[list[LinkIcon]]
 
     def as_dict(self):
         """ Returns ChannelDescription as a JSON-like object """

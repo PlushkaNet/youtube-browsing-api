@@ -1,85 +1,64 @@
 """ File containing code for testing channel info fetch """
 
-from youtube_browsing_api import GetChannelInfo, Languages
+from youtube_browsing_api import GetChannelInfo, Languages, InvalidStatusError
+from requests.exceptions import ReadTimeout, ConnectionError
+from time import sleep
 
-chan_id = "UC_aEa8K-EOJ3D6gOs7HcyNg" # NCS channel
+def full_channel_test(channel_url: str, **kwargs):
+    print(f"testing URL: {channel_url}")
+    chan = GetChannelInfo(channel_url, **kwargs)
 
-# basic test
-chan = GetChannelInfo(chan_id)
-test_i = 1
+    assert chan.full_desc == None
 
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
+    chan.fetch_description()
 
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
+    print("test passed")
 
-# test with username
-chan = GetChannelInfo("@NoCopyrightSounds")
+    del chan
 
-test_i += 1
+def test_with_retry(func):
+    for retry in range(5):
+        try:
+            func()
+            return
+        except ReadTimeout, ConnectionError:
+            print(f"WARNING: read timeout/connection error, retrying in 2 seconds, try={retry}")
+            sleep(2)
+    print("skip as not successful")
 
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
+test_set = [
+    # famous, big channels
+    "@NoCopyrightSounds", "https://www.youtube.com/@NoCopyrightSounds",
+    "https://www.youtube.com/channel/UC_aEa8K-EOJ3D6gOs7HcyNg", "https://youtube.com/@NoCopyrightSounds",
+    "https://youtube.com/channel/UC_aEa8K-EOJ3D6gOs7HcyNg", "https://www.youtube.com/@jawed", "https://www.youtube.com/@LinusTechTips",
+    # some incomplete / abandoned / small channels
+    "https://www.youtube.com/@dartone8061",
+    "https://www.youtube.com/@HRIDAYRoy-eq3qh",
+    "https://www.youtube.com/@official_gagada01",
+    "https://www.youtube.com/@bunlak5604"
+]
 
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
+print("run tests: only channel url's")
+for channel_url in test_set:
+    def test():
+        try:
+            full_channel_test(channel_url)
+        except InvalidStatusError as e:
+            print(f"WARNING: YouTube returned reponse with invalid status code {e.status_code}")
+    test_with_retry(test)
+    sleep(0.5) # sleep for a while to avoid confusing YouTube
 
-# test with URL (vanity)
-chan = GetChannelInfo("https://www.youtube.com/@NoCopyrightSounds")
-test_i += 1
+print("run tests: with language and timeout passed")
+for channel_url in test_set:
+    for language in dir(Languages):
+        if not language.startswith("__"):
+            def test():
+                try:
+                    full_channel_test(channel_url, language=language, timeout=2.0)
+                except InvalidStatusError as e:
+                    print(f"WARNING: YouTube returned reponse with invalid status code {e.status_code}")
+            print(f"testing with language: {language}")
+            test_with_retry(test)
+            sleep(0.5) # sleep for a while to avoid confusing YouTube
 
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
-
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
-
-# test with URL (standart)
-chan = GetChannelInfo(f"https://www.youtube.com/channel/{chan_id}")
-test_i += 1
-
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
-
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
-
-# test with no-www URL (vanity)
-chan = GetChannelInfo("https://youtube.com/@NoCopyrightSounds")
-test_i += 1
-
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
-
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
-
-# test with no-www URL (standart)
-chan = GetChannelInfo(f"https://youtube.com/channel/{chan_id}")
-test_i += 1
-
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
-
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
-
-# test with special flags
-chan = GetChannelInfo(chan_id, language=Languages.TR, timeout=9.0)
-test_i += 1
-
-assert chan.full_desc == None
-if len(chan.short_desc) == 0:
-    print(f"WARNING: short_desc for test #{test_i} is 0")
-
-if chan.banner_img == None:
-    print(f"WARNING: banner_img for test #{test_i} is None")
-
-print("All tests passed successfully!")
+print("all tests passed")

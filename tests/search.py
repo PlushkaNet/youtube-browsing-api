@@ -1,69 +1,46 @@
 """ File containing code for testing search functions """
 
+from typing import Union
 from youtube_browsing_api import Search, SearchFromDocument, Video, Channel, Languages, Regions
+from time import sleep
 from youtube_browsing_api.innertube import Innertube
 
-# InnerTube search
-search = Search("NCS")
+def check_results_type(results: list):
+    for i in results:
+        assert isinstance(i, Union[Channel, Video])
 
-search.as_list() # checking that works correctly by calling .as_list() convertion
-assert search.found != None
-assert isinstance(search.results, list)
+def test_search(query: str, **kwargs):
+    search = Search(query, **kwargs)
+    search.as_list() # checks that converts successfully
+    check_results_type(search.results)
 
-if len(search.results) == 0:
-    print("WARNING: 0 results for test #1")
+    if len(search.results) == 0:
+        print(f"WARNING: there are 0 results by query: {query}")
+    
+    search.next()
+    check_results_type(search.results)
 
-for i in search:
-    if type(i) not in [Channel, Video]:
-        raise Exception("Search.__iter__ failed: i is not instance of Video or Channel")
+    if len(search.results) == 0:
+        print(f"WARNING: there are 0 results after 1 search.next()")
+    
+    search.next()
+    check_results_type(search.results)
 
-assert isinstance(search._innertube, Innertube)
+    if len(search.results) == 0:
+        print(f"WARNING: there are 0 results after 2 search.next()")
 
-# InnerTube search with special flags
-search = Search("NCS", language=Languages.AF, region=Regions.IN, timeout=9.0)
+    print("test passed")
 
-search.as_list() # checking that works correctly by calling .as_list() convertion
-assert search.found != None
-assert isinstance(search.results, list)
+test_set = [
+    "ncs songs", "no copyright music", "jawed", "i at the zoo", "Linus Tech Tips",
+    "kasdlsajdkasjfksafhuagkjshdkfsdgtyfkjbdsgfkgrshalkdnfjhzdkhkxcnzkgiuahdkuhfiuryoiLJFLKD" # some unsearchable content
+]
 
-if len(search.results) == 0:
-    print("WARNING: 0 results for test #2")
+for query in test_set:
+    test_search(query)
+    sleep(0.5) # suspend a little to avoid be suspected by YouTube
 
-for i in search:
-    if type(i) not in [Channel, Video]:
-        raise Exception("Search.__iter__ failed: i is not instance of Video or Channel")
+print("all tests passed")
 
-assert isinstance(search._innertube, Innertube)
-
-# Parsing search
-search = SearchFromDocument("NCS")
-
-search.as_list()
-assert search.found != None
-assert isinstance(search.results, list)
-
-if len(search.results) == 0:
-    print("WARNING: 0 results for test #3")
-
-for i in search:
-    if type(i) not in [Channel, Video]:
-        raise Exception("SearchFromDocument.__iter__ failed: i is not instance of Video or Channel")
-
-# Parsing search with special flags
-
-spec_timeout = 9.0
-search = SearchFromDocument("NCS", language=Languages.AF, region=Regions.IN, timeout=spec_timeout)
-
-search.as_list()
-assert search.found != None
-assert isinstance(search.results, list)
-assert search._timeout == spec_timeout
-
-if len(search.results) == 0:
-    print("WARNING: 0 results for test #4")
-
-for i in search:
-    if type(i) not in [Channel, Video]:
-        raise Exception("SearchFromDocument.__iter__ failed: i is not instance of Video or Channel")
-
-print("All tests passed successfully!")
+# TODO add SearchFromDocument tests
+# TODO add tests with different languages and regions

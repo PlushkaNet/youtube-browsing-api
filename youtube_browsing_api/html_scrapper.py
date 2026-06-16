@@ -11,13 +11,11 @@ GOOGLEBOT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 }
 
-
 @dataclass
 class ScrapResponseData:
     """ Class for serving data from scraper method """
     data    :dict
     cookies :CookieJar
-
 
 def scrap_request(url: str, headers: dict = GOOGLEBOT_HEADERS, language: str = Languages.EN, timeout: float = 5.0) -> ScrapResponseData:
     """
