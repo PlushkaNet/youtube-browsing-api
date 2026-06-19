@@ -1,4 +1,7 @@
-""" File containing code for interaction with InnerTube API """
+# pylint: disable=C0301
+"""
+File containing code for interaction with InnerTube API
+"""
 
 import json
 import requests
@@ -37,7 +40,7 @@ class InnertubeRequest:
     def __setitem__(self, k: str, v):
         """ Just interface for dictionary's method __setitem__ inside class object """
         self._body[k] = v
-    
+
     def __getitem__(self, k: str):
         """ Just interface for dictionary's method __getitem__ inside class object """
         return self._body[k]
@@ -59,13 +62,13 @@ class InnertubeRequest:
 
         if response.status_code != 200:
             raise InvalidStatusError(response.status_code)
-        
+
         self.cookies = response.cookies # freshes up cookies
 
         try:
             data = json.loads(response.text)
-        except:
-            raise JSONParsingError("Failed to parse JSON from YouTube's InnerTube API\nProbably this happens because YouTube returned invalid JSON content")
+        except json.JSONDecodeError as e:
+            raise JSONParsingError("Failed to parse JSON from YouTube's InnerTube API\nProbably this happens because YouTube returned invalid JSON content") from e
 
         return data
 
@@ -89,7 +92,7 @@ class Innertube:
         self._timeout = timeout # timeout for all requests maked by Innertube
 
         self.cookies = requests.cookies.CookieJar() # creates empty CookieJar
-    
+
     def make_request(self, endpoint: str) -> InnertubeRequest:
         """ Constructs InnertubeRequest object and returns it """
         return InnertubeRequest(endpoint, self._template, self._timeout, self.cookies)

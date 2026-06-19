@@ -1,9 +1,12 @@
-""" File containing code for requesting and scraping data from YouTube HTML pages """
+# pylint: disable=C0301
+"""
+File containing code for requesting and scraping data from YouTube HTML pages
+"""
 
-import requests
-from requests.cookies import CookieJar
 import json
 from dataclasses import dataclass
+import requests
+from requests.cookies import CookieJar
 from .types import InvalidStatusError, ExtractorError, JSONParsingError
 from .enums import Languages
 
@@ -41,12 +44,12 @@ def scrap_request(url: str, headers: dict = GOOGLEBOT_HEADERS, language: str = L
         except ValueError: # Scraper-compatible YouTube parsing
             data = response.text[response.text.index("// scraper_data_begin")+42::]
             data = data[:data.index('// scraper_data_end')-3]
-    except:
-        raise ExtractorError("Extracting error while trying to find ytInitialData or // scrapper_data_begin\nProbably this because page is invalid or YouTube changed their internal extractor")
+    except ValueError as e:
+        raise ExtractorError("Extracting error while trying to find ytInitialData or // scrapper_data_begin\nProbably this because page is invalid or YouTube changed their internal extractor") from e
 
     try:
         data = json.loads(data) # replaces raw data with JSON extracted dict data
-    except:
-        raise JSONParsingError("Failed to parse JSON from YouTube's in-document data")
+    except json.JSONDecodeError as e:
+        raise JSONParsingError("Failed to parse JSON from YouTube's in-document data") from e
 
     return ScrapResponseData(data, response.cookies)
