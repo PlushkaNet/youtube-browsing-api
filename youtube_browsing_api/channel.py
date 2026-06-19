@@ -1,4 +1,7 @@
-""" File containing code for YouTube channels operations """
+# pylint: disable=C0301
+"""
+File containing code for YouTube channels operations
+"""
 
 from typing import Optional
 from .innertube import Innertube, InnertubeRequest

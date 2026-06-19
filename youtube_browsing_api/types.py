@@ -1,3 +1,4 @@
+# pylint: disable=C0301
 """ File containing code for common exceptions and YouTube entries objects """
 
 from typing import Optional
@@ -30,7 +31,7 @@ def _translate_account_type(account_type: str) -> str:
         account_type = AccountTypes.VERIFIED
     else:
         account_type = AccountTypes.REGULAR
-    
+
     return account_type
 
 class Video:
@@ -73,29 +74,28 @@ class Video:
         self.channel_thumbnail = channel_thumbnail
         self.short_desc        = short_desc
         self.account_type      = _translate_account_type(account_type)
-        
-        # translating duration field (str) to int (seconds)
-        # its often looks like
-        # 3:21:53, not more than 3 parts, and not less than 2 parts
+
+        # Converting duration field from string to integer (seconds)
+        # It usually looks like "3:21:53" — no more than 3 parts, and no fewer than 2 parts
         timeparts = duration.split(":")
         try:
             if len(timeparts) == 2:
                 self.duration = int(timeparts[0])*60+int(timeparts[1])
             elif len(timeparts) == 3:
                 self.duration = int(timeparts[0])*60*60+int(timeparts[1])*60+int(timeparts[2])
-        except:
+        except ValueError:
             self.duration = duration # fallback
 
-        # translating views field
-        # its often looks like
-        # 1,234,567 views
-        # or 1,128 views
-        # or 120 views
-        # so we just remove commas
+        # Converting views field
+        # It usually looks like:
+        # "1,234,567 views"
+        # "1,128 views"
+        # or "120 views"
+        # So we simply remove commas
         try:
             views_num_str = views.split()[0] # should be list of 2 items
             self.views = str(int(views_num_str.replace(",", "")))
-        except:
+        except ValueError:
             self.views = views # fallback
 
     def as_dict(self):
@@ -137,7 +137,7 @@ class Channel:
 
     def __post_init__(self):
         self.account_type = _translate_account_type(self.account_type)
-        
+
         if self.thumbnail.startswith("//"):
             self.thumbnail = "https:" + self.thumbnail
 
@@ -148,14 +148,14 @@ class Channel:
 @dataclass
 class LinkIcon:
     """
-    Class representing link icons in channel full description
-    `title` serves link title from the author
-    `resourse_url` serves original URL to resourse from author
-    `icons` serves dictionary in format resolution:url
+    Represents icon links in a channel's full description.
 
-    More about `icons` field:
-    resolution (dictionary key) example: "64x64", where first "64" - width, second "64" - height
-    url is url to internal google storage with icon
+    Attributes:
+        title (str): The link title provided by the author.
+        resource_url (str): The original URL to the resource provided by the author.
+        icons (dict[str, str]): A dictionary mapping resolution strings to icon URLs.
+            Resolution format: "64x64" — the first number is width, the second is height.
+            The URL points to internal Google Storage.
     """
     title        :str
     resourse_url :str

@@ -1,11 +1,12 @@
+# pylint: disable=C0301
 """
 File containing code for parsing suggest queries from YouTube
 """
 
 from typing import Optional, List
-import requests
 import json
 from urllib import parse
+import requests
 
 from .enums import Languages, Regions
 
@@ -17,7 +18,7 @@ def _clear_google_response(resp:str) -> str:
 def parse_text_queries(text_json:str) -> Optional[List[str]]:
     try:
         data = json.loads(text_json)
-    except:
+    except json.JSONDecodeError:
         return None
 
     if type(data) != list or len(data) <= 1:
@@ -32,7 +33,7 @@ def parse_text_queries(text_json:str) -> Optional[List[str]]:
     for i in combined_queries:
         if len(i) == 0: # skip empty sets
             continue
-        if type(i[0]) == str: # append only string queries
+        if isinstance(i[0], str): # append only string queries
             queries.append(i[0])
 
     return queries
@@ -59,7 +60,7 @@ def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, ti
         response = requests.get(query, timeout=timeout)
     except:
         return None
-    
+
     if response.ok:
         return parse_text_queries(_clear_google_response(response.text))
     return None

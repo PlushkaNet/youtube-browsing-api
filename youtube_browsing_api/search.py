@@ -1,4 +1,7 @@
-""" File containing code for YouTube search operations using both InnerTube API and parsing """
+# pylint: disable=C0301
+"""
+File containing code for YouTube search operations using both InnerTube API and parsing
+"""
 
 from typing import Union, Any
 from urllib import parse
@@ -49,6 +52,11 @@ class Search:
         and requests.get() exceptions
         """
 
+        self._data: dict[str, Any]
+        self.results: list[Union[Video, Channel]]
+        self.found: int
+        self._continuation: str
+
         self._innertube = Innertube(language, region, timeout=timeout)
         self._query = query # saves query for future use
 
@@ -59,13 +67,15 @@ class Search:
         self._innertube.cookies = request.cookies
 
         # parses YouTube response
-        self._data: dict[str, Any] = parser(data)
-        self.results: list[Union[Video, Channel]] = self._data["results"]
+        self._data = parser(data)
+        self.results = self._data["results"]
         self.found = self._data["estimated_results"]
         self._continuation = self._data["_continuation"]
 
     def next(self): # TODO improve doc
-        """ Fetches next results """
+        """
+        Fetches next results
+        """
 
         request = self._innertube.make_request("search")
         request["continuation"] = self._continuation
@@ -102,7 +112,7 @@ class SearchFromDocument:
     def _make_url(self, query: str, page: int, region: str):
         """ Internal method for prepare url to fetch from """
         return "https://www.youtube.com/results?q=" + parse.quote(query, safe="") + f"&page={page}&gl={region}"
-    
+
     def __iter__(self):
         """ YouTube results iterator """
         yield from self.results
@@ -154,7 +164,7 @@ class SearchFromDocument:
         self._query    :str  = query
         self._language :str  = language
         self._headers  :dict = headers
-        
+
         # prepares url and saves it for future use
         self._url = self._make_url(query, page, region)
 

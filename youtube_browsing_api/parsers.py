@@ -1,4 +1,7 @@
-""" File containing code for different parsers """
+# pylint: disable=C0301
+"""
+File containing code for different parsers
+"""
 
 from typing import Union, Any
 from .types import Video, Channel, ParserError, ChannelDescription, LinkIcon
@@ -10,10 +13,10 @@ def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]
     """
     results = []
 
-    for sectionRenderer in contents:
+    for section_renderer in contents:
         try:
-            if "videoRenderer" in sectionRenderer:
-                video_renderer = sectionRenderer["videoRenderer"]
+            if "videoRenderer" in section_renderer:
+                video_renderer = section_renderer["videoRenderer"]
                 results.append(
                     Video(
                         video_renderer["videoId"],
@@ -29,8 +32,8 @@ def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]
                     )
                 )
 
-            elif "channelRenderer" in sectionRenderer:
-                channel_renderer = sectionRenderer["channelRenderer"]
+            elif "channelRenderer" in section_renderer:
+                channel_renderer = section_renderer["channelRenderer"]
                 results.append(
                     Channel(
                         channel_renderer["channelId"],
@@ -40,7 +43,7 @@ def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]
                         channel_renderer.get("ownerBadges", [{}])[0].get("metadataBadgeRenderer", {}).get("style", "regular")
                     )
                 )
-        except:
+        except KeyError:
             continue
 
     return results
@@ -54,24 +57,30 @@ def youtube_search_parse(data: dict) -> dict[str, Any]:
         contents = data["contents"]["twoColumnSearchResultsRenderer"]["primaryContents"]["sectionListRenderer"]["contents"]
         result["results"] = youtube_search_contents_parse(contents[0]["itemSectionRenderer"]["contents"])
         result["_continuation"] = contents[1]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
-    except KeyError:
-        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+    except KeyError as e:
+        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints") from e
 
     return result
 
 def youtube_search_continuation_parse(data: dict) -> dict[str, Any]:
+    """
+    Parses search continuation results
+    """
     result = {}
 
     try:
         result["estimated_results"] = data["estimatedResults"]
         result["results"] = youtube_search_contents_parse(data["onResponseReceivedCommands"][0]["appendContinuationItemsAction"]["continuationItems"][0]["itemSectionRenderer"]["contents"])
         result["_continuation"] = data["onResponseReceivedCommands"][0]["appendContinuationItemsAction"]["continuationItems"][1]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
-    except KeyError:
-        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints")
+    except KeyError as e:
+        raise ParserError("Parsing entities error\nProbably this because of YouTube updated their endpoints") from e
 
     return result
 
 def youtube_search_fallback_parse(data: dict) -> dict[str, Any]:
+    """
+    Tryes two extract data from search using two different extractors
+    """
     try:
         return youtube_search_parse(data)
     except ParserError:
@@ -87,14 +96,9 @@ def youtube_channel_parse(data: dict) -> dict[str, Any]:
     result = {}
 
     try:
-        # trying to get banner image url if it exists
-        try:
-            result["banner_img"] = data['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']['banner']['imageBannerViewModel']['image']['sources'][0]['url']
-        except:
-            result["banner_img"] = None
-
         header_content = data['header']['pageHeaderRenderer']['content']['pageHeaderViewModel']
-        
+        result["banner_img"] = header_content.get("banner", {}).get("imageBannerViewModel", {}).get("image", {}).get("sources", [{}])[0].get("url", None)
+
         result["_desc_continuation_token"] = header_content["description"]["descriptionPreviewViewModel"]["rendererContext"]["commandContext"]["onTap"]["innertubeCommand"]["showEngagementPanelEndpoint"]["engagementPanel"]["engagementPanelSectionListRenderer"]["content"]["sectionListRenderer"]["contents"][0]["itemSectionRenderer"]["contents"][0]["continuationItemRenderer"]["continuationEndpoint"]["continuationCommand"]["token"]
 
         result["short_desc"] = header_content["description"]["descriptionPreviewViewModel"]["description"]["content"] # small description part (starting str)
@@ -109,8 +113,8 @@ def youtube_channel_parse(data: dict) -> dict[str, Any]:
         result["keywords"] = metadata["keywords"]
         result["channel_url"] = metadata["channelUrl"]
         result["vanity_channel_url"] = metadata["vanityChannelUrl"]
-    except KeyError:
-        raise ParserError(f"Channel parsing failed\nProbably this because YouTube changed their data endpoints")
+    except KeyError as e:
+        raise ParserError("Channel parsing failed\nProbably this because YouTube changed their data endpoints") from e
 
     return result
 
@@ -147,5 +151,5 @@ def youtube_channel_description_parse(data: dict) -> ChannelDescription:
             metadata.get("country", None),
             link_icons
         )
-    except:
-       raise ParserError(f"Channel full description parsing failed\nProbably this because YouTube changed their data endpoints")
+    except KeyError as e:
+        raise ParserError("Channel full description parsing failed\nProbably this because YouTube changed their data endpoints") from e

@@ -1,3 +1,6 @@
+"""
+Languages and enums for convenient module usage
+"""
 from typing import Final
 
 # TODO add more languages
