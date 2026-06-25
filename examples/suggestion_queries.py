@@ -1,6 +1,4 @@
-"""
-Suggestion queries API usage example
-"""
+"""Suggestion queries API usage example"""
 
 from youtube_browsing_api import get_suggest_queries
 

@@ -1,6 +1,4 @@
-"""
-Get channel info API usage example
-"""
+"""Get channel info API usage example"""
 
 from youtube_browsing_api import GetChannelInfo
 

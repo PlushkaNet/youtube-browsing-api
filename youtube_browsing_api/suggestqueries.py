@@ -1,7 +1,5 @@
 # pylint: disable=C0301
-"""
-File containing code for parsing suggest queries from YouTube
-"""
+"""File with code for parsing suggest queries from YouTube"""
 
 from typing import Optional, List
 import json

@@ -7,7 +7,7 @@ import json
 import requests
 from requests.cookies import CookieJar
 from .enums import Languages, Regions
-from .types import InvalidStatusError, JSONParsingError
+from .exceptions import InvalidStatusError, JSONParsingError
 
 # default Innertube client data template
 WEB_CLIENT_NO_DATA = {
@@ -26,23 +26,21 @@ WEB_CLIENT_NO_DATA = {
 }
 
 class InnertubeRequest:
-    """
-    Class containing code for manipulating request to InnerTube API v1 (youtubei/v1)
-    """
+    """Class containing code for manipulating request to InnerTube API v1 (youtubei/v1)"""
 
     def __init__(self, endpoint: str, template: dict, timeout: float, cookies: CookieJar):
-        """ Constructs class object"""
+        """Constructs class object"""
         self._endpoint = endpoint
         self._body = template
         self._timeout = timeout
         self.cookies = cookies # cookies can be replaced by new response's cookies in .send() method
 
     def __setitem__(self, k: str, v):
-        """ Just interface for dictionary's method __setitem__ inside class object """
+        """Just interface for dictionary's method __setitem__ inside class object"""
         self._body[k] = v
 
     def __getitem__(self, k: str):
-        """ Just interface for dictionary's method __getitem__ inside class object """
+        """Just interface for dictionary's method __getitem__ inside class object"""
         return self._body[k]
 
     def perform(self) -> dict:
@@ -73,9 +71,7 @@ class InnertubeRequest:
         return data
 
 class Innertube:
-    """
-    Class containing code for serving request settings
-    """
+    """Class containing code for serving request settings"""
 
     def __init__(self, hl: str = Languages.EN, gl: str = Regions.US, template: dict = WEB_CLIENT_NO_DATA, timeout: float = 5.0):
         """
@@ -94,5 +90,5 @@ class Innertube:
         self.cookies = requests.cookies.CookieJar() # creates empty CookieJar
 
     def make_request(self, endpoint: str) -> InnertubeRequest:
-        """ Constructs InnertubeRequest object and returns it """
+        """Constructs InnertubeRequest object and returns it"""
         return InnertubeRequest(endpoint, self._template, self._timeout, self.cookies)

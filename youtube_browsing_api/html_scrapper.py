@@ -1,13 +1,11 @@
 # pylint: disable=C0301
-"""
-File containing code for requesting and scraping data from YouTube HTML pages
-"""
+"""File containing code for requesting and scraping data from YouTube HTML pages"""
 
 import json
 from dataclasses import dataclass
 import requests
 from requests.cookies import CookieJar
-from .types import InvalidStatusError, ExtractorError, JSONParsingError
+from .exceptions import InvalidStatusError, ExtractorError, JSONParsingError
 from .enums import Languages
 
 GOOGLEBOT_HEADERS = {
@@ -16,7 +14,7 @@ GOOGLEBOT_HEADERS = {
 
 @dataclass
 class ScrapResponseData:
-    """ Class for serving data from scraper method """
+    """Class for serving data from scraper method"""
     data    :dict
     cookies :CookieJar
 
