@@ -5,19 +5,15 @@ class YouTubeError(Exception):
 
 class InnerTubeAPIRequestError(YouTubeError):
     """Raised when cannot perform a request to InnerTube API"""
-    pass
 
 class ExtractorError(YouTubeError):
     """Raised when cannot extract data from page"""
-    pass
 
 class ParserError(YouTubeError):
     """Raised when cannot parse response from YouTube due to unexpected content"""
-    pass
 
 class JSONParsingError(YouTubeError):
     """Raised when cannt parse JSON from YouTube"""
-    pass
 
 class InvalidStatusError(YouTubeError):
     """Raised when InnerTube API returned response with unexpected status"""

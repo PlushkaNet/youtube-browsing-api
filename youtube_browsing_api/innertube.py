@@ -1,7 +1,5 @@
 # pylint: disable=C0301
-"""
-File containing code for interaction with InnerTube API
-"""
+"""File containing code for interaction with InnerTube API"""
 
 import json
 import requests

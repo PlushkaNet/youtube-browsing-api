@@ -83,7 +83,7 @@ class GetChannelInfo:
         self.full_desc: Optional[ChannelDescription] = None
 
         self._data = channel_info # save for future use
-        
+
     def fetch_description(self):
         """
         Fetches channel descritpion and saves it to `full_desc` field
