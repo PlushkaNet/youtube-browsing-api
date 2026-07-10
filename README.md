@@ -4,12 +4,12 @@
 ## 🔥 Quick start
 Install stable package version via pip using:
 ```
-pip install git+https://github.com/PlushkaNet/youtube_browsing_api.git
+pip install git+https://github.com/PlushkaNet/youtube-browsing-api.git
 ```
 
 Or try nightly using:
 ```
-pip install git+https://github.com/PlushkaNet/youtube_browsing_api@dev
+pip install git+https://github.com/PlushkaNet/youtube-browsing-api@dev
 ```
 
 <b>📜 Suggestion queries usage example:</b>
