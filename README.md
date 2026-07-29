@@ -1,18 +1,22 @@
-<h1>🔎 Youtube browsing API</h1>
-<i>Uses both document parsing and InnerTube API to fetch data from YouTube</i>
+# 🔎 Youtube browsing API
+
+> *Uses both document parsing and InnerTube API to fetch data from YouTube*
 
 ## 🔥 Quick start
+
 Install stable package version via pip using:
 ```
-pip install git+https://github.com/PlushkaNet/youtube-browsing-api.git
+pip install git+https://github.com/PlushkaNet/youtube_browsing_api.git
 ```
 
 Or try nightly using:
 ```
-pip install git+https://github.com/PlushkaNet/youtube-browsing-api@dev
+pip install git+https://github.com/PlushkaNet/youtube_browsing_api@dev
 ```
 
-<b>📜 Suggestion queries usage example:</b>
+## ⚙️ Usage
+
+**📜 Suggestion queries usage example**
 ```
 from youtube_browsing_api import get_suggest_queries
 
@@ -22,7 +26,7 @@ for i in range(len(queries)):
     print(f"Suggestion query #{i+1}: {queries[i]}")
 ```
 
-<b>🔎 Search usage example:</b>
+**🔎 Search usage example:**
 ```
 from youtube_browsing_api import Search
 
@@ -36,7 +40,7 @@ results.next() # fetch next results
 print(results.results) # new results
 ```
 
-<b>🔎 Exploring channels usage example:</b>
+**🔎 Exploring channels usage example:**
 ```
 from youtube_browsing_api import GetChannelInfo
 
@@ -54,28 +58,27 @@ print(chan.full_desc.join_date)
 print(chan.full_desc.region)
 ```
 
-<h3>📚 Complete examples can be found in <a href="examples/">examples/</a> directory</h3>
-<ul>
-<li><b><a href="examples/suggestion_queries.py">Suggestion queries complete example</a></b></li>
-<li><b><a href="examples/search.py">Videos/Channels search complete example</a></b></li>
-<li><b><a href="examples/channel.py">Fetching channel info complete example</a></b></li>
-</ul>
+**📚 Complete examples can be found in [examples/](examples/) directory**
+- **[Suggestion queries complete example](examples/suggestion_queries.py)**
+- **[Videos/Channels search complete example](examples/search.py)**
+- **[Fetching channel info complete example](examples/channel.py)**
 
-<b>✅ Currently supports:</b>
+**✅ Currently supports:**
 - Suggestion queries
 - Search
 - Exploring channels (partly)
 
-<b>🛠️ In development (channels):</b>
+**🛠️ In development (channels):**
 - Recent videos
 - All videos
 - Playlists
 
-<b>🛠️ In development (search):</b>
+**🛠️ In development (search):**
 - Search filters
 
-<b>🛠️ In development (internal):</b>
+**🛠️ In development (internal):**
 - Increase persistence of parsers
 
-<br>
-<i>If you find this project helpful, please consider giving it a ⭐</i>
+---
+
+*If you find this project helpful, please consider giving it a ⭐*
