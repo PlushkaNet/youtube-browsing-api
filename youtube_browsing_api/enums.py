@@ -1,11 +1,9 @@
-"""
-Languages and enums for convenient module usage
-"""
+"""Languages and enums for convenient module usage"""
 from typing import Final
 
 # TODO add more languages
 class Languages:
-    """ Enum with YouTube-supported localisations """
+    """Enum with YouTube-supported localisations"""
     EN    :Final[str] = "en"    # English
     AR    :Final[str] = "ar"    # Arabic
     ES_US :Final[str] = "es-us" # Spanish
@@ -22,13 +20,13 @@ class Languages:
     TR    :Final[str] = "tr"    # Turkish
 
 class AccountTypes:
-    """ Enum with account types for channels """
+    """Enum with account types for channels"""
     REGULAR  :Final[str] = "regular"  # just regular account type
     ARTIST   :Final[str] = "artist"   # verified music artist
     VERIFIED :Final[str] = "verified" # verified account type
 
 class Regions:
-    """ Class serving YouTube-supported regions """
+    """Class serving YouTube-supported regions"""
     US :Final[str] = "US" # United States
     AD :Final[str] = "AD" # Andorra
     AE :Final[str] = "AE" # United Arab Emirates

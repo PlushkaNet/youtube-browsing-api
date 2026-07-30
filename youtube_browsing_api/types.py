@@ -1,30 +1,12 @@
 # pylint: disable=C0301
-""" File containing code for common exceptions and YouTube entries objects """
+"""File with code for YouTube entries objects (dataclasses)"""
 
 from typing import Optional
 from dataclasses import dataclass, asdict
 from .enums import AccountTypes
 
-# marked for future use
-class InnerTubeAPIRequestError(Exception):
-    pass
-
-class ExtractorError(Exception):
-    pass
-
-class ParserError(Exception):
-    pass
-
-class JSONParsingError(Exception):
-    pass
-
-class InvalidStatusError(Exception):
-    def __init__(self, status_code: int):
-        self.status_code = status_code
-        super().__init__(f"Status code is {status_code}")
-
 def _translate_account_type(account_type: str) -> str:
-    """ Translates account type to internal StrEnum type """
+    """Translates account type to internal StrEnum type"""
     if account_type == "BADGE_STYLE_TYPE_VERIFIED_ARTIST":
         account_type = AccountTypes.ARTIST
     elif account_type == "BADGE_STYLE_TYPE_VERIFIED":
@@ -99,7 +81,7 @@ class Video:
             self.views = views # fallback
 
     def as_dict(self):
-        """ Returns Video as a JSON-like object """
+        """Returns Video as a JSON-like object"""
         return {
             "id"                :self.id,
             "title"             :self.title,

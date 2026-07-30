@@ -1,6 +1,4 @@
-"""
-Search API usage example
-"""
+"""Search API usage example"""
 
 from youtube_browsing_api import Search, Video, Channel, Languages, Regions
 

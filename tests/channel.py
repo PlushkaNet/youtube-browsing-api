@@ -1,8 +1,9 @@
-""" File containing code for testing channel info fetch """
+"""File containing code for testing channel info fetch"""
 
-from youtube_browsing_api import GetChannelInfo, Languages, InvalidStatusError
-from requests.exceptions import ReadTimeout, ConnectionError
 from time import sleep
+from secrets import choice
+from requests.exceptions import ReadTimeout, ConnectionError
+from youtube_browsing_api import GetChannelInfo, Languages, InvalidStatusError
 
 def full_channel_test(channel_url: str, **kwargs):
     print(f"testing URL: {channel_url}")
@@ -38,27 +39,39 @@ test_set = [
     "https://www.youtube.com/@bunlak5604"
 ]
 
-print("run tests: only channel url's")
+print("running tests: only channel url's")
 for channel_url in test_set:
     def test():
         try:
-            full_channel_test(channel_url)
+            full_channel_test(channel_url, timeout=2.0)
         except InvalidStatusError as e:
-            print(f"WARNING: YouTube returned reponse with invalid status code {e.status_code}")
+            print(f"WARNING: YouTube returned response with invalid status code {e.status_code}")
     test_with_retry(test)
     sleep(0.5) # sleep for a while to avoid confusing YouTube
 
-print("run tests: with language and timeout passed")
-for channel_url in test_set:
-    for language in dir(Languages):
-        if not language.startswith("__"):
-            def test():
-                try:
-                    full_channel_test(channel_url, language=language, timeout=2.0)
-                except InvalidStatusError as e:
-                    print(f"WARNING: YouTube returned reponse with invalid status code {e.status_code}")
-            print(f"testing with language: {language}")
-            test_with_retry(test)
-            sleep(0.5) # sleep for a while to avoid confusing YouTube
+print("running tests: with language specified")
+def smart_lang_choice() -> str:
+    # chooses language from `Languages`
+    l = choice(dir(Languages))
+    while l.startswith("__"):
+        l = choice(dir(Languages))
+    return l
+
+# generating set of random different languages to test with
+languages = []
+for _ in range(len(test_set)):
+    languages.append(smart_lang_choice())
+
+print(f"generated language set: {languages!r}")
+
+for i, channel_url in enumerate(test_set):
+    def test():
+        try:
+            full_channel_test(channel_url, language=languages[i], timeout=2.0)
+        except InvalidStatusError as e:
+            print(f"WARNING: YouTube returned response with invalid status code {e.status_code}")
+    print(f"testing with language: {languages[i]}")
+    test_with_retry(test)
+    sleep(0.5) # sleep for a while to avoid confusing YouTube
 
 print("all tests passed")

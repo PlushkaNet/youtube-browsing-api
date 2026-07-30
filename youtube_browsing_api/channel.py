@@ -1,7 +1,5 @@
 # pylint: disable=C0301
-"""
-File containing code for YouTube channels operations
-"""
+"""File containing code for YouTube channels operations"""
 
 from typing import Optional
 from .innertube import Innertube, InnertubeRequest
@@ -85,7 +83,7 @@ class GetChannelInfo:
         self.full_desc: Optional[ChannelDescription] = None
 
         self._data = channel_info # save for future use
-        
+
     def fetch_description(self):
         """
         Fetches channel descritpion and saves it to `full_desc` field

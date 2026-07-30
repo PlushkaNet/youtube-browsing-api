@@ -1,7 +1,5 @@
 # pylint: disable=C0301
-"""
-File containing code for parsing suggest queries from YouTube
-"""
+"""File with code for parsing suggest queries from YouTube"""
 
 from typing import Optional, List
 import json
@@ -21,11 +19,11 @@ def parse_text_queries(text_json:str) -> Optional[List[str]]:
     except json.JSONDecodeError:
         return None
 
-    if type(data) != list or len(data) <= 1:
+    if not isinstance(data, list) or len(data) <= 1:
         return None
 
     combined_queries = data[1]
-    if type(combined_queries) != list:
+    if not isinstance(combined_queries, list):
         return None # not a valid queries list
 
     queries: List[str] = []

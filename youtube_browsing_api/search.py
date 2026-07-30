@@ -1,6 +1,7 @@
 # pylint: disable=C0301
 """
-File containing code for YouTube search operations using both InnerTube API and parsing
+File with code for YouTube search operations
+using both InnerTube API and web page parsing
 """
 
 from typing import Union, Any

@@ -1,10 +1,9 @@
 # pylint: disable=C0301
-"""
-File containing code for different parsers
-"""
+"""File containing code for different parsers"""
 
 from typing import Union, Any
-from .types import Video, Channel, ParserError, ChannelDescription, LinkIcon
+from .types import Video, Channel, ChannelDescription, LinkIcon
+from .exceptions import ParserError
 
 def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]:
     """
@@ -49,7 +48,7 @@ def youtube_search_contents_parse(contents: list) -> list[Union[Channel, Video]]
     return results
 
 def youtube_search_parse(data: dict) -> dict[str, Any]:
-    """ YouTube search default (and single for now) parsing method """
+    """YouTube search default (and single for now) parsing method"""
     result = {}
 
     try:
@@ -63,9 +62,7 @@ def youtube_search_parse(data: dict) -> dict[str, Any]:
     return result
 
 def youtube_search_continuation_parse(data: dict) -> dict[str, Any]:
-    """
-    Parses search continuation results
-    """
+    """Parses search continuation results"""
     result = {}
 
     try:
@@ -78,9 +75,7 @@ def youtube_search_continuation_parse(data: dict) -> dict[str, Any]:
     return result
 
 def youtube_search_fallback_parse(data: dict) -> dict[str, Any]:
-    """
-    Tryes two extract data from search using two different extractors
-    """
+    """Tries to extract data from search using two different extractors"""
     try:
         return youtube_search_parse(data)
     except ParserError:
