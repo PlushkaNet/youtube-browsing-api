@@ -1,13 +1,11 @@
-""" File containing code for testing search functions """
+"""File with code for testing search functions"""
 
-from typing import Union
-from youtube_browsing_api import Search, SearchFromDocument, Video, Channel, Languages, Regions
 from time import sleep
-from youtube_browsing_api.innertube import Innertube
+from youtube_browsing_api import Search, Video, Channel
 
 def check_results_type(results: list):
     for i in results:
-        assert isinstance(i, Union[Channel, Video])
+        assert isinstance(i, Channel | Video)
 
 def test_search(query: str, **kwargs):
     search = Search(query, **kwargs)
@@ -40,7 +38,4 @@ for query in test_set:
     test_search(query)
     sleep(0.5) # suspend a little to avoid be suspected by YouTube
 
-print("all tests passed")
-
-# TODO add SearchFromDocument tests
-# TODO add tests with different languages and regions
+print("search tests passed")
