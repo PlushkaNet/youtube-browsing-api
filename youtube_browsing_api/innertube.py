@@ -3,7 +3,7 @@
 
 import json
 import requests
-from requests.cookies import CookieJar
+from requests.cookies import RequestsCookieJar
 from .enums import Languages, Regions
 from .exceptions import InvalidStatusError, JSONParsingError
 
@@ -26,7 +26,7 @@ WEB_CLIENT_NO_DATA = {
 class InnertubeRequest:
     """Class containing code for manipulating request to InnerTube API v1 (youtubei/v1)"""
 
-    def __init__(self, endpoint: str, template: dict, timeout: float, cookies: CookieJar):
+    def __init__(self, endpoint: str, template: dict, timeout: float, cookies: RequestsCookieJar):
         """Constructs class object"""
         self._endpoint = endpoint
         self._body = template
@@ -85,7 +85,7 @@ class Innertube:
         self._template["context"]["hl"] = hl # sets up language in template context
         self._timeout = timeout # timeout for all requests maked by Innertube
 
-        self.cookies = requests.cookies.CookieJar() # creates empty CookieJar
+        self.cookies = requests.cookies.RequestsCookieJar() # creates empty CookieJar
 
     def make_request(self, endpoint: str) -> InnertubeRequest:
         """Constructs InnertubeRequest object and returns it"""

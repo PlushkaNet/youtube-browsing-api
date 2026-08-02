@@ -1,3 +1,5 @@
+![python-versions-supported](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
 # 🔎 Youtube browsing API
 
 > *Uses both document parsing and InnerTube API to fetch data from YouTube*

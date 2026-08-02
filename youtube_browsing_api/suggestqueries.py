@@ -52,7 +52,7 @@ def get_suggest_queries(query: str, language=Languages.EN, region=Regions.US, ti
     # hl - language
     # cp - number of suggestions
     # q - query
-    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={parse.quote(query, safe="")}"
+    query = f"https://suggestqueries-clients6.youtube.com/complete/search?ds=yt&hl={language}&gl={region}&client=youtube&gs_ri=youtube&h=180&w=320&ytvs=1&gs_id=i&q={parse.quote(query, safe='')}"
 
     try:
         response = requests.get(query, timeout=timeout)

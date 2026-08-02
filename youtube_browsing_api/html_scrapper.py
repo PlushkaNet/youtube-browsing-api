@@ -4,7 +4,7 @@
 import json
 from dataclasses import dataclass
 import requests
-from requests.cookies import CookieJar
+from requests.cookies import RequestsCookieJar
 from .exceptions import InvalidStatusError, ExtractorError, JSONParsingError
 from .enums import Languages
 
@@ -16,7 +16,7 @@ GOOGLEBOT_HEADERS = {
 class ScrapResponseData:
     """Class for serving data from scraper method"""
     data    :dict
-    cookies :CookieJar
+    cookies :RequestsCookieJar
 
 def scrap_request(url: str, headers: dict = GOOGLEBOT_HEADERS, language: str = Languages.EN, timeout: float = 5.0) -> ScrapResponseData:
     """
